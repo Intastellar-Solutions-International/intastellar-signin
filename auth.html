@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login...</title>
 </head>
 <body>
     <img id="profileImage" src="">
     <h1>Welcome <span id="user"></span></h1>
     <script>
         const data = new URLSearchParams(window.location.search).get("token");
-        const decryptData = JSON.parse(window.atob(data));
-        document.querySelector("#user").innerText = decryptData.name;
-        document.querySelector("#profileImage").src = decryptData.image;
-        console.log(decryptData.name);
+        const decryptData = window.atob(data);
+        localStorage.setItem("user", decryptData);
+        window.location.href = "test.html";
     </script>
 </body>
 </html>
