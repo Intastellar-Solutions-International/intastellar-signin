@@ -10,14 +10,13 @@
 <body>
     <img id="profileImage" src="">
     <h1>Welcome <span id="user"></span></h1>
-    <div id="buttonDiv" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div> 
+    <div id="buttonDiv" data-client_id="" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div> 
     <script>
         Intastellar.accounts.id.renderButton(
             document.querySelector("#buttonDiv")
         )
 
         if(localStorage.getItem("user")){
-            console.log(JSON.parse(localStorage.getItem("user")).image);
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
             document.querySelector("#user").innerText = JSON.parse(localStorage.getItem("user")).name;
         }

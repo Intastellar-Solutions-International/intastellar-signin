@@ -28,7 +28,8 @@ class IntastellarAccounts{
 function signin(){
     const loginUri = document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service="+ appName +"&continue="+ loginUri +"&entryFlow="+ window.btoa(loginUri) +"&passive=true&flowName=WebSignin&Entry=webauthsignin", 'popUpWindow','height=719,width=500,left=100,top=100,resizable=no');
+    const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
+    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service="+ appName +"&continue="+ loginUri +"&entryFlow="+ window.btoa(loginUri) +"&key="+key+"&passive=true&flowName=WebSignin&Entry=webauthsignin", 'popUpWindow','height=719,width=500,left=100,top=100,resizable=no');
 
     window.addEventListener("message", function(e){
         const token = e.data;
@@ -41,7 +42,20 @@ function signin(){
 /* Check user loggedin status on intastellaraccounts.com */
 
 function checkUserLogin(){
-
+    fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php", {
+        method: 'GET',
+        credentials: 'include'
+    }).then(e => e.json()).then(e => {
+        if(e.status == 200){
+            const user = e.data;
+            const loginbtn = document.querySelector(".intastellarSignin");
+            const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
+            loginbtn.innerHTML += "<img src='"+user.image+"'>";
+            intastellarSignInInfo.innerHTML = "Continue as " + user.name;
+        }
+    }).catch(e => {
+        console.log(e);
+    })
 }
 
 const Intastellar = {
@@ -50,6 +64,7 @@ const Intastellar = {
             renderButton(element, theme = {}){
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
+                IntastellarText.setAttribute("class", "intastellarSignIn-info");
                 IntastellarText.innerHTML = "Signin with Intastellar"
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
                 const IntastellarLogo = document.createElement("img");
@@ -57,9 +72,12 @@ const Intastellar = {
                 IntastellarLogo.setAttribute("class", "intastellar-logo");
                 IntastellarSigninButton.appendChild(IntastellarLogo);
                 IntastellarSigninButton.appendChild(IntastellarText);
-                element.appendChild(IntastellarSigninButton);
 
-                IntastellarSigninButton.addEventListener("click", signin);
+                if(element != null || element != undefined){
+                    element.appendChild(IntastellarSigninButton);
+                    IntastellarSigninButton.addEventListener("click", signin);
+                }
+                /* checkUserLogin(); */
             }
         }
     }
