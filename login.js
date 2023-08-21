@@ -62,6 +62,10 @@ const Intastellar = {
     accounts: {
         id: {
             renderButton(element, theme = {}){
+                const styleSheet = document.createElement("link");
+                styleSheet.rel = "stylesheet";
+                styleSheet.href = "https://account.api.intastellarsolutions.com/insign/style.css";
+                document.head.appendChild(styleSheet);
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
