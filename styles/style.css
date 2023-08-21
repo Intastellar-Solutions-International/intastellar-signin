@@ -1,0 +1,16 @@
+.IntastellarSignin{
+    padding: 15px 30px 15px 20px;
+    font-size: 14px;
+    border: 1px solid #c4c4cc;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.intastellar-logo{
+    width: 30px;
+    margin-right: 5px;
+}

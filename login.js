@@ -1,3 +1,4 @@
+const intastellarLogoSrc = "https://www.intastellarsolutions.com/assets/icons/fav/android-icon-192x192.png";
 class IntastellarAccounts{
     constructor(){
         /* Intastellar API root for IntastellarA Accounts */
@@ -31,9 +32,16 @@ function signin(){
 
     window.addEventListener("message", function(e){
         const token = e.data;
+        document.cookie = "c_name=" + JSON.parse(window.atob(e.data)).user_id + "; expire=; domain=" + window.location.host;
         loginWindow.postMessage("success", e.origin);
         window.location.href = "http://" + loginUri + "?token=" + token;
     })
+}
+
+/* Check user loggedin status on intastellaraccounts.com */
+
+function checkUserLogin(){
+
 }
 
 const Intastellar = {
@@ -41,8 +49,14 @@ const Intastellar = {
         id: {
             renderButton(element, theme = {}){
                 const IntastellarSigninButton = document.createElement("button");
+                const IntastellarText = document.createElement("div");
+                IntastellarText.innerHTML = "Signin with Intastellar"
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
-                IntastellarSigninButton.innerHTML = "Signin with Intastellar";
+                const IntastellarLogo = document.createElement("img");
+                IntastellarLogo.setAttribute("src", intastellarLogoSrc)
+                IntastellarLogo.setAttribute("class", "intastellar-logo");
+                IntastellarSigninButton.appendChild(IntastellarLogo);
+                IntastellarSigninButton.appendChild(IntastellarText);
                 element.appendChild(IntastellarSigninButton);
 
                 IntastellarSigninButton.addEventListener("click", signin);

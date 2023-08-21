@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="styles/style.css">
     <script src="./login.js"></script>
 </head>
 <body>
+    <img id="profileImage" src="">
+    <h1>Welcome <span id="user"></span></h1>
     <div id="buttonDiv" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div> 
     <script>
         Intastellar.accounts.id.renderButton(
             document.querySelector("#buttonDiv")
         )
+
+        if(localStorage.getItem("user")){
+            console.log(JSON.parse(localStorage.getItem("user")).image);
+            document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
+            document.querySelector("#user").innerText = JSON.parse(localStorage.getItem("user")).name;
+        }
     </script>
 </body>
 </html>
