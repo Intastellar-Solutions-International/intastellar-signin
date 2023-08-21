@@ -65,7 +65,7 @@ const Intastellar = {
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
-                IntastellarText.innerHTML = "Signin with Intastellar"
+                IntastellarText.innerHTML = "Sign in with Intastellar"
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
                 const IntastellarLogo = document.createElement("img");
                 IntastellarLogo.setAttribute("src", intastellarLogoSrc)
