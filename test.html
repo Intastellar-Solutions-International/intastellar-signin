@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="styles/style.css">
-    <script src="./insign/client.js"></script>
+    <script src="./login.js"></script>
 </head>
 <body>
     <img id="profileImage" src="">
-    <h1>Welcome <span id="user"></span></h1>
-    <div id="buttonDiv" data-client_id="" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div> 
+    <h1 id="user"></h1>
+    <div id="buttonDiv" data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div> 
+    <!-- data-login_uri="127.0.0.1:5500/auth.html" -->
     <script>
+
         Intastellar.accounts.id.renderButton(
             document.querySelector("#buttonDiv")
         )
 
         if(localStorage.getItem("user")){
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
-            document.querySelector("#user").innerText = JSON.parse(localStorage.getItem("user")).name;
+            document.querySelector("#user").innerText = "Welcome " + JSON.parse(localStorage.getItem("user")).name;
         }
     </script>
 </body>
