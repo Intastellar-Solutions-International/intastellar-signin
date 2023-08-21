@@ -27,10 +27,13 @@ class IntastellarAccounts{
 function signin(){
     const loginUri = document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service="+ appName +"&continue="+ loginUri +"&entryFlow="+ window.btoa(loginUri) +"&passive=true&flowName=WebSignin&Entry=authlogin", 'popUpWindow','height=719,width=500,left=100,top=100,resizable=no');
-    setTimeout(() => {
-        loginWindow.close();
-    },);
+    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service="+ appName +"&continue="+ loginUri +"&entryFlow="+ window.btoa(loginUri) +"&passive=true&flowName=WebSignin&Entry=webauthsignin", 'popUpWindow','height=719,width=500,left=100,top=100,resizable=no');
+
+    window.addEventListener("message", function(e){
+        const token = e.data;
+        loginWindow.postMessage("success", e.origin);
+        window.location.href = "http://" + loginUri + "?token=" + token;
+    })
 }
 
 const Intastellar = {
