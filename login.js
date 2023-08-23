@@ -42,7 +42,7 @@ function signin(){
         }
 
         if(document.querySelector("[data-login_uri]") != null){
-            window.parent.close();
+            loginWindow.close();
             window.location.href = "http://" + loginUri + "?token=" + token;
         }else if(document.querySelector("[data-login_callback]") != null){
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
