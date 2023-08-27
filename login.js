@@ -54,19 +54,17 @@ function signin(){
 /* Check user loggedin status on intastellaraccounts.com */
 
 function checkUserLogin(){
-    fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php", {
+    fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php?origin=" + window.location.host, {
         method: 'GET',
         credentials: "include",
         mode: 'cors',
     }).then(e => e.json()).then(e => {
-        console.log(e);
-        if(e.status == 200){
-            const user = e.data;
-            const loginbtn = document.querySelector(".intastellarSignin");
-            const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
-            loginbtn.innerHTML += "<img src='"+user.image+"'>";
-            intastellarSignInInfo.innerHTML = "Continue as " + user.name;
-        }
+        const user = e.user;
+        const loginbtn = document.querySelector(".IntastellarSignin");
+
+        const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
+        intastellarSignInInfo.innerHTML = "Continue as " + user.name;
+        loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-left: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
     }).catch(e => {
         console.log(e);
     })
@@ -94,8 +92,8 @@ const Intastellar = {
                 if(element != null || element != undefined){
                     element.appendChild(IntastellarSigninButton);
                     IntastellarSigninButton.addEventListener("click", signin);
+                    checkUserLogin();
                 }
-                checkUserLogin();
             }
         }
     }
