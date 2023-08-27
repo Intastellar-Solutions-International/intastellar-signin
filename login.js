@@ -31,10 +31,10 @@ function signin(){
     const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
     const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service="+ appName +"&continue="+ loginUri +"&entryFlow="+ window.btoa(loginUri) +"&key="+key+"&passive=true&flowName=WebSignin&Entry=webauthsignin", 'popUpWindow','height=719,width=500,left=100,top=100,resizable=no');
 
-    window.addEventListener("message", function(e){
-        const token = e.data;
-        document.cookie = "c_name=" + JSON.parse(window.atob(token)).user_id + "; expire=; domain=" + window.location.host;
-        loginWindow.postMessage("iframe-token-recieved", e.origin);
+    window.addEventListener("message", function(token){
+        const t = token.data;
+        document.cookie = "c_name=" + JSON.parse(window.atob(t)).user_id + "; expire=; domain=" + window.location.host;
+        loginWindow.postMessage("iframe-token-recieved", token.origin);
 
         if(document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null){
             console.error("Intastellar SDK: Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
@@ -43,10 +43,10 @@ function signin(){
 
         if(document.querySelector("[data-login_uri]") != null){
             loginWindow.close();
-            window.location.href = "http://" + loginUri + "?token=" + token;
+            window.location.href = "http://" + loginUri + "?token=" + t;
         }else if(document.querySelector("[data-login_callback]") != null){
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
-            fn(JSON.parse(window.atob(token)))
+            fn(JSON.parse(window.atob(t)))
         }
     })
 }
@@ -56,8 +56,10 @@ function signin(){
 function checkUserLogin(){
     fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php", {
         method: 'GET',
-        credentials: 'include'
+        credentials: "include",
+        mode: 'cors',
     }).then(e => e.json()).then(e => {
+        console.log(e);
         if(e.status == 200){
             const user = e.data;
             const loginbtn = document.querySelector(".intastellarSignin");
@@ -93,7 +95,7 @@ const Intastellar = {
                     element.appendChild(IntastellarSigninButton);
                     IntastellarSigninButton.addEventListener("click", signin);
                 }
-                /* checkUserLogin(); */
+                checkUserLogin();
             }
         }
     }
