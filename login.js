@@ -25,6 +25,20 @@ class IntastellarAccounts{
     }
 }
 
+class IntastellarSolutionsSDKError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = 'IntastellarSolutionsSDKError';
+    }
+};
+
+class IntastellarSolutionsSDKSuccess extends Error {
+    constructor(message) {
+      super(message);
+      this.name = 'IntastellarSolutionsSDK';
+    }
+};
+
 function signin(){
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
@@ -37,7 +51,7 @@ function signin(){
         loginWindow.postMessage("iframe-token-recieved", token.origin);
 
         if(document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null){
-            console.error("Intastellar SDK: Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
+            new IntastellarSolutionsSDKError("Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
             return;
         }
 
@@ -46,7 +60,8 @@ function signin(){
             window.location.href = "http://" + loginUri + "?token=" + t;
         }else if(document.querySelector("[data-login_callback]") != null){
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
-            fn(JSON.parse(window.atob(t)))
+            new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name)
+            fn(JSON.parse(window.atob(t)));
         }
     })
 }
@@ -54,7 +69,7 @@ function signin(){
 /* Check user loggedin status on intastellaraccounts.com */
 
 function checkUserLogin(){
-    fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php?origin=" + window.location.host, {
+    fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php", {
         method: 'GET',
         credentials: "include",
         mode: 'cors',
@@ -66,7 +81,7 @@ function checkUserLogin(){
         intastellarSignInInfo.innerHTML = "Continue as " + user.name;
         loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-left: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
     }).catch(e => {
-        console.log(e);
+        /* console.log(e); */
     })
 }
 const styleSheet = document.createElement("link");
