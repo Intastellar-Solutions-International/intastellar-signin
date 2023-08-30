@@ -68,8 +68,8 @@ function signin(){
 
 /* Check user loggedin status on intastellaraccounts.com */
 
-function checkUserLogin(){
-    fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php", {
+async function checkUserLogin(){
+    await fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php?origin="+window.location.host, {
         method: 'GET',
         credentials: "include",
         mode: 'cors',
