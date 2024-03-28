@@ -106,7 +106,10 @@ const Intastellar = {
 
                 if(element != null || element != undefined){
                     element.appendChild(IntastellarSigninButton);
-                    IntastellarSigninButton.addEventListener("click", signin);
+                    IntastellarSigninButton.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        signin();
+                    });
                     checkUserLogin();
                 }
             }
