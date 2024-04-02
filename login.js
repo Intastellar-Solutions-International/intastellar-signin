@@ -78,8 +78,8 @@ async function checkUserLogin(){
         const loginbtn = document.querySelector(".IntastellarSignin");
 
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
-        intastellarSignInInfo.innerHTML = "Continue as " + user.name;
-        loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-left: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
+        intastellarSignInInfo.innerHTML = "Sign in as " + user.name;
+        loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-right: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
     }).catch(e => {
         /* console.log(e); */
     })
@@ -101,8 +101,12 @@ const Intastellar = {
                 const IntastellarLogo = document.createElement("img");
                 IntastellarLogo.setAttribute("src", intastellarLogoSrc)
                 IntastellarLogo.setAttribute("class", "intastellar-logo");
-                IntastellarSigninButton.appendChild(IntastellarLogo);
                 IntastellarSigninButton.appendChild(IntastellarText);
+                IntastellarSigninButton.appendChild(IntastellarLogo);
+
+                const IntastellarSigniniFrame = document.createElement("iframe");
+                IntastellarSigniniFrame.setAttribute("id", "intastellar-signin-iframe");
+                IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button.php?v=" + Math.random());
 
                 if(element != null || element != undefined){
                     element.appendChild(IntastellarSigninButton);

@@ -16,12 +16,14 @@
     height: 30px;
     border-radius: 50%;
     object-fit: cover;
-    margin-left: 5px;
+    margin-right: 5px;
+    order: -1;
 }
 
 .intastellar-logo{
     width: 30px;
-    margin-right: 5px;
+    margin-left: 5px;
+    order: 1;
 }
 
 .IntastellarSignin:hover{
