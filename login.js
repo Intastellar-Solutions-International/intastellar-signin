@@ -116,7 +116,7 @@ const Intastellar = {
     accounts: {
         id: {
             renderButton(element, theme = {}){
-                const type = document.querySelector("[data-type]").getAttribute("data-type");
+                const type = document.querySelector("[data-type]")?.getAttribute("data-type");
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
