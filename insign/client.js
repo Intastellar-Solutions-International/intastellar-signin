@@ -109,6 +109,7 @@ async function checkUserLogin(){
             intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
         }
         loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-right: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
+        console.log(loginbtn);
     }).catch(e => {
         /* console.log(e); */
     })
