@@ -98,7 +98,7 @@ async function checkUserLogin(){
     }).then(e => e.json()).then(e => {
         const user = e.user;
         const loginbtn = document.querySelector(".IntastellarSignin");
-        console.log(user);
+        console.log(user, e);
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
         if(type == null || type == undefined || type == ""){
             intastellarSignInInfo.innerHTML = "Sign in as " + user.name + "<br>";
