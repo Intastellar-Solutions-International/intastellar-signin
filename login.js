@@ -45,6 +45,28 @@ function signin(){
     const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
     const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service="+ appName +"&continue="+ loginUri +"&entryFlow="+ window.btoa(loginUri) +"&key="+key+"&passive=true&flowName=WebSignin&Entry=webauthsignin", 'popUpWindow','height=719,width=500,left=100,top=100,resizable=no');
 
+    if(loginWindow == null){
+        new IntastellarSolutionsSDKError("Please enable popups for this website");
+        return;
+    }
+
+    const checkLoadedAndClosed = setInterval(function() {
+        try {
+            // If this doesn't throw an exception, the page is loaded
+            if (loginWindow.document) {
+                console.log("Popup window loaded.");
+            }
+        } catch(e) {
+            // The page is not loaded yet, ignore the security exception
+            /* console.log(e); */
+        }
+        // Check if the window is closed
+        if (loginWindow.closed){
+            /* console.log("Popup window closed."); */
+            clearInterval(checkLoadedAndClosed);
+        }
+    }, 1000);
+
     window.addEventListener("message", function(token){
         const t = token.data;
         document.cookie = "c_name=" + JSON.parse(window.atob(t)).user_id + "; expire=; domain=" + window.location.host;
