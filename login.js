@@ -98,11 +98,11 @@ async function checkUserLogin(){
     }).then(e => e.json()).then(e => {
         const user = e.user;
         const loginbtn = document.querySelector(".IntastellarSignin");
-
+        console.log(user, e);
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
-        if(type == null || type == undefined || type == "" || type == "intastellar"){
-            intastellarSignInInfo.innerHTML = "Sign up as " + user.name + "<br>";
-        intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
+        if(type == null || type == undefined || type == ""){
+            intastellarSignInInfo.innerHTML = "Sign in as " + user.name + "<br>";
+            intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
         }else if(type == "signup"){
             intastellarSignInInfo.innerHTML = "Sign up as " + user.name + "<br>";
             intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
