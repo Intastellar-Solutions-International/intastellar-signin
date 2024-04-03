@@ -116,10 +116,15 @@ const Intastellar = {
     accounts: {
         id: {
             renderButton(element, theme = {}){
+                const type = document.querySelector("[data-type]").getAttribute("data-type");
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
-                IntastellarText.innerHTML = "Sign in with Intastellar"
+                if(type == null || type == undefined || type == "" || type == "intastellar"){
+                    IntastellarText.innerHTML = "Sign in with Intastellar"
+                }else if(type == "signup"){
+                    IntastellarText.innerHTML = "Sign up with Intastellar"
+                }
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
                 const IntastellarLogo = document.createElement("img");
                 IntastellarLogo.setAttribute("src", intastellarLogoSrc)
