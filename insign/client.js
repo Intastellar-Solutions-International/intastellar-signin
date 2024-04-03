@@ -98,6 +98,7 @@ async function checkUserLogin(){
     }).then(e => e.json()).then(e => {
         const user = e.user;
         const loginbtn = document.querySelector(".IntastellarSignin");
+        const type = document.querySelector("[data-type]")?.getAttribute("data-type");
         console.log(user, e);
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
         if(type == null || type == undefined || type == ""){
