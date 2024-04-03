@@ -100,8 +100,13 @@ async function checkUserLogin(){
         const loginbtn = document.querySelector(".IntastellarSignin");
 
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
-        intastellarSignInInfo.innerHTML = "Sign in as " + user.name + "<br>";
+        if(type == null || type == undefined || type == "" || type == "intastellar"){
+            intastellarSignInInfo.innerHTML = "Sign up as " + user.name + "<br>";
         intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
+        }else if(type == "signup"){
+            intastellarSignInInfo.innerHTML = "Sign up as " + user.name + "<br>";
+            intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
+        }
         loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-right: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
     }).catch(e => {
         /* console.log(e); */
