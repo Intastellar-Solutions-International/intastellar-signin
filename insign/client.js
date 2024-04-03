@@ -98,7 +98,7 @@ async function checkUserLogin(){
     }).then(e => e.json()).then(e => {
         const user = e.user;
         const loginbtn = document.querySelector(".IntastellarSignin");
-        const type = document.querySelector("[data-type]")?.getAttribute("data-type");
+        const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
         console.log(type);
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
         if(type == null || type == undefined || type == ""){
@@ -123,7 +123,7 @@ const Intastellar = {
     accounts: {
         id: {
             renderButton(element, theme = {}){
-                const type = document.querySelector("[data-type]")?.getAttribute("data-type");
+                const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
