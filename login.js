@@ -98,6 +98,7 @@ async function checkUserLogin(){
     }).then(e => e.json()).then(e => {
         const user = e.user;
         const loginbtn = document.querySelector(".IntastellarSignin");
+        const type = document.querySelector("[data-type]")?.getAttribute("data-type");
         console.log(user, e);
         const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
         if(type == null || type == undefined || type == ""){
@@ -108,6 +109,7 @@ async function checkUserLogin(){
             intastellarSignInInfo.innerHTML += "<span class='email'>"+user.email+"</span>";
         }
         loginbtn.innerHTML += "<img style='width: 30px; height=: 30px; margin-right: 5px; border-radius: 50%; object-fit: cover;' class='intastellar-userProfile' src='"+user.image+"'>";
+        console.log(loginbtn);
     }).catch(e => {
         /* console.log(e); */
     })
