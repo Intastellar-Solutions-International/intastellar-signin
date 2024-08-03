@@ -1,32 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intastellar Accounts Login API test</title>
     <script src="./login.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <img id="profileImage" width="150px" height="150px" style="object-fit: cover;" src="">
-    <h1 id="user"></h1>
-    <!-- <div id="buttonDiv" data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div>  -->
-    <div id="buttonDiv" data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d" data-app-name="Example App" data-login_callback="logUserIn"></div> 
+
+<body class="grid content">
+    <h1>Intastellar Accounts Login API test</h1>
+    <div id="buttonDiv"
+        data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d"
+        data-app-name="Example App" data-theme="dark" data-login_callback="logUserIn"></div>
+    <div class="profile">
+        <img id="profileImage" src="" alt="Profile Image">
+        <h2 id="user"></h2>
+    </div>
     <script>
 
-        Intastellar.accounts.id.renderButton(
-            document.querySelector("#buttonDiv")
+        Intastellar.accounts.id.renderButton("buttonDiv",
+            {
+                'theme': 'dark',
+                'scopes': [
+                    'birthday',
+                    'phone'
+                ]
+            }
         )
 
-        function logUserIn(token){
+        function logUserIn(token) {
             localStorage.setItem("user", JSON.stringify(token));
             document.querySelector("#profileImage").src = token.image;
-            document.querySelector("#user").innerText = "Welcome " + token.name;
+            document.querySelector("#user").innerHTML = "This is your profile: <br>";
+            document.querySelector("#user").innerHTML += "Welcome " + token.name;
+            document.querySelector("#user").innerHTML += "<br>" + token.email;
+            document.querySelector("#user").innerHTML += "<br>" + token?.scope.phone;
+            document.querySelector("#user").innerHTML += "<br>" + token?.scope.birthday;
+
+
+            console.log(token);
         }
 
-        if(localStorage.getItem("user")){
+        if (localStorage.getItem("user")) {
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
-            document.querySelector("#user").innerText = "Welcome " + JSON.parse(localStorage.getItem("user")).name;
+            document.querySelector("#user").innerHTML = "This is your profile: <br>";
+            document.querySelector("#user").innerHTML += "Welcome " + JSON.parse(localStorage.getItem("user")).name;
+            document.querySelector("#user").innerHTML += "<br> " + JSON.parse(localStorage.getItem("user")).email;
+            document.querySelector("#user").innerHTML += "<br> " + JSON.parse(localStorage.getItem("user"))?.scope.birthday;
         }
     </script>
 </body>
+
 </html>

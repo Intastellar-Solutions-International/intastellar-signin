@@ -1,5 +1,5 @@
-.IntastellarSignin{
-    padding: 8px 20px 8px 20px;
+.IntastellarSignin {
+    padding: 8px 14px 8px 14px;
     font-size: 14px;
     border: 1px solid #c4c4cc;
     border-radius: 5px;
@@ -7,34 +7,55 @@
     align-items: center;
     justify-content: space-between;
     background-color: #fff;
+    color: #272727;
     cursor: pointer;
     transition: all .5s ease-in-out;
 }
 
-.intastellar-userProfile{
+.IntastellarSignin:hover {
+    background-color: #fff;
+    color: #272727;
+}
+
+.IntastellarSignin.dark {
+    background-color: #272727;
+    color: #fff;
+}
+
+.IntastellarSignin.dark:hover {
+
+    background-color: #272727;
+    color: #fff;
+}
+
+.intastellar-userProfile {
     width: 30px;
     height: 30px;
+    margin-right: 5px;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 5px;
     order: -1;
 }
 
-.intastellar-logo{
-    width: 40px;
+.intastellar-logo.reverse {
     margin-left: 5px;
+    margin-right: 0;
     order: 1;
 }
 
-.IntastellarSignin:hover{
-    transform: scale(1.02);
-    background-color: #e7e7e7;
+.intastellarSignIn-info {
+    font-size: 15px;
 }
 
-#profileImage{
+.intastellar-logo {
+    width: 40px;
+    margin-right: 5px;
+}
+
+#profileImage {
     border-radius: 50%;
 }
 
-.email{
+.email {
     font-size: 11px;
 }
