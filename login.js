@@ -100,12 +100,15 @@ function signin() {
         if (document.querySelector("[data-login_uri]") != null) {
             loginWindow.close();
             // Check if current url has a query string
-            if (window.location.href.indexOf("?") > -1) {
+            const query = "?" + window.location.href.split("?")[1];
+            console.log(window.location.href + query + "&token=" + t);
+
+            /* if (window.location.href.indexOf("?") > -1) {
                 const query = "?" + window.location.href.split("?")[1];
                 window.location.href = window.location.href + query + "&token=" + t;
             } else {
                 window.location.href = window.location.href + "?token=" + t;
-            }
+            } */
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name)
