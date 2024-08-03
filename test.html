@@ -10,7 +10,9 @@
 </head>
 
 <body class="grid content">
-    <h1>Intastellar Accounts Login API test</h1>
+    <header>
+        <h1>Intastellar Accounts Login API test</h1>
+    </header>
     <div id="buttonDiv"
         data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d"
         data-app-name="Example App" data-theme="dark" data-login_callback="logUserIn"></div>
@@ -36,7 +38,7 @@
             document.querySelector("#user-info").innerHTML = "";
             localStorage.setItem("user", JSON.stringify(token));
             document.querySelector("#profileImage").src = token.image;
-            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.name + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.name.firstName + "</h1>";
             document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p>" + token.email + "</p>";
             document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.birthday + "</p>";
@@ -47,7 +49,7 @@
 
         if (localStorage.getItem("user")) {
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
-            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).name + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).name.firstName + "</h1>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).email + "</p>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.birthday + "</p>";
