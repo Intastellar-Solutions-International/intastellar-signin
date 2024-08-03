@@ -16,28 +16,29 @@
         data-app-name="Example App" data-theme="dark" data-login_callback="logUserIn"></div>
     <div class="profile">
         <img id="profileImage" src="" alt="Profile Image">
-        <h2 id="user"></h2>
+        <div id="user">
+            <p>This is you Intastellar Account</p>
+            <div id="user-info"></div>
+        </div>
     </div>
     <script>
 
         Intastellar.accounts.id.renderButton("buttonDiv",
             {
                 'theme': 'dark',
-                'scopes': [
-                    'birthday',
-                    'phone'
-                ]
+                'scopes': ['phone', 'birthday']
             }
         )
 
         function logUserIn(token) {
+            document.querySelector("#profileImage").src = "";
+            document.querySelector("#user-info").innerHTML = "";
             localStorage.setItem("user", JSON.stringify(token));
             document.querySelector("#profileImage").src = token.image;
-            document.querySelector("#user").innerHTML = "This is your profile: <br>";
-            document.querySelector("#user").innerHTML += "Welcome " + token.name;
-            document.querySelector("#user").innerHTML += "<br>" + token.email;
-            document.querySelector("#user").innerHTML += "<br>" + token?.scope.phone;
-            document.querySelector("#user").innerHTML += "<br>" + token?.scope.birthday;
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.name + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.email + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.birthday + "</p>";
 
 
             console.log(token);
@@ -45,10 +46,10 @@
 
         if (localStorage.getItem("user")) {
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
-            document.querySelector("#user").innerHTML = "This is your profile: <br>";
-            document.querySelector("#user").innerHTML += "Welcome " + JSON.parse(localStorage.getItem("user")).name;
-            document.querySelector("#user").innerHTML += "<br> " + JSON.parse(localStorage.getItem("user")).email;
-            document.querySelector("#user").innerHTML += "<br> " + JSON.parse(localStorage.getItem("user"))?.scope.birthday;
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).name + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).email + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.birthday + "</p>";
         }
     </script>
 </body>
