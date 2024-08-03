@@ -105,9 +105,9 @@ function signin() {
             if (window.location.href.indexOf("?") > -1) {
                 const query = "?" + window.location.href.split("?")[1];
                 // Add the query string to the url
-                window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname + query + "&token=" + t;
+                window.location.href = window.location.protocol + "//" + loginUri + query + "&token=" + t;
             } else {
-                window.location.href = window.location.href + "?token=" + t;
+                window.location.href = window.location.protocol + "//" + loginUri + "?token=" + t;
             }
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
