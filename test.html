@@ -1,32 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intastellar Accounts Login API test</title>
     <script src="./login.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <img id="profileImage" width="150px" height="150px" style="object-fit: cover;" src="">
-    <h1 id="user"></h1>
-    <!-- <div id="buttonDiv" data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d" data-app-name="Example App" data-login_uri="127.0.0.1:5500/auth.html"></div>  -->
-    <div id="buttonDiv" data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d" data-app-name="Example App" data-login_callback="logUserIn"></div> 
+
+<body class="grid content">
+    <header>
+        <h1>Intastellar Accounts Login API test</h1>
+    </header>
+    <div id="buttonDiv"
+        data-client_id="d2eefd7f1564fa4c9714000456183a6b0f51e8c9519e1089ec41ce905ffc0c453dfac91ae8645c41ebae9c59e7a6e5233b1339e41a15723a9ba6d934bbb3e92d"
+        data-app-name="Example App" data-theme="dark" data-login_callback="logUserIn"></div>
+    <div class="profile">
+        <img id="profileImage" src="https://scontent-uc-d2c-7.intastellar.com/a/s/ul/p/avtr46-img/profile_standard.jpg"
+            alt="Profile Image">
+        <div id="user">
+            <p>This is you Intastellar Account</p>
+            <div id="user-info"></div>
+        </div>
+    </div>
     <script>
 
-        Intastellar.accounts.id.renderButton(
-            document.querySelector("#buttonDiv")
+        Intastellar.accounts.id.renderButton("buttonDiv",
+            {
+                'theme': 'dark',
+                'scopes': ['phone', 'birthday']
+            }
         )
 
-        function logUserIn(token){
+        function logUserIn(token) {
+            document.querySelector("#profileImage").src = "";
+            document.querySelector("#user-info").innerHTML = "";
             localStorage.setItem("user", JSON.stringify(token));
             document.querySelector("#profileImage").src = token.image;
-            document.querySelector("#user").innerText = "Welcome " + token.name;
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.name.firstName + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.email + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.birthday + "</p>";
+
+
+            console.log(token);
         }
 
-        if(localStorage.getItem("user")){
+        if (localStorage.getItem("user")) {
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
-            document.querySelector("#user").innerText = "Welcome " + JSON.parse(localStorage.getItem("user")).name;
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).name.firstName + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).email + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.birthday + "</p>";
         }
     </script>
 </body>
+
 </html>
