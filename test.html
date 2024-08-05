@@ -37,22 +37,22 @@
             document.querySelector("#profileImage").src = "";
             document.querySelector("#user-info").innerHTML = "";
             localStorage.setItem("user", JSON.stringify(token));
-            document.querySelector("#profileImage").src = token.image;
-            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.name.firstName + "</h1>";
-            document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.phone + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p>" + token.email + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p>" + token?.scope.birthday + "</p>";
+            document.querySelector("#profileImage").src = token.user.image;
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.user.name.firstName + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.user?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.user.email + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.user?.scope.birthday + "</p>";
 
 
             console.log(token);
         }
 
         if (localStorage.getItem("user")) {
-            document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).image;
-            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).name.firstName + "</h1>";
-            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.phone + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).email + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user"))?.scope.birthday + "</p>";
+            document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).user.image;
+            document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).user.name.firstName + "</h1>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user.email + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.scope.birthday + "</p>";
         }
     </script>
 </body>
