@@ -172,7 +172,7 @@ styleSheet.rel = "stylesheet";
 styleSheet.href = "https://account.api.intastellarsolutions.com/insign/style.css";
 
 if (window.location.host == "localhost" || window.location.host.indexOf("127.0.0.1") > -1) {
-    styleSheet.href = "/insign/style.css";
+    styleSheet.href = "./insign/style.css";
 }
 
 document.head.appendChild(styleSheet);
