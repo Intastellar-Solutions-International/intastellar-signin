@@ -67,9 +67,12 @@ function signin() {
 
     // Get root domain
     const domain = window.location.host.split(".");
-    const access_id = domain[domain.length - 2] + "." + domain[domain.length - 1];
-
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + access_id + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    let access_id = domain[domain.length - 2] + "." + domain[domain.length - 1];
+    // Keep the port if it exists
+    if (window.location.port) {
+        access_id += ":" + window.location.port;
+    }
+    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(access_id) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
 
     if (loginWindow == null) {
         new IntastellarSolutionsSDKError("Please enable popups for this website");
