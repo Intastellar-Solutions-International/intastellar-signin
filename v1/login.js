@@ -79,7 +79,7 @@ function signin() {
             const query = "?" + window.location.href.split("?")[1];
             const token = t;
 
-            fetch("https://apis.intastellaraccounts.com/verify.php", {
+            fetch("https://apis.intastellaraccounts.com/verify", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ function signin() {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
             const token = t;
-            fetch("https://apis.intastellaraccounts.com/verify.php", {
+            fetch("https://apis.intastellaraccounts.com/verify", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
