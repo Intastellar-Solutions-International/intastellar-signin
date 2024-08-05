@@ -15,18 +15,29 @@ class IntastellarSolutionsSDKSuccess extends Error {
 
 function signin() {
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
+    const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
+    const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
     const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
     const scope = document.querySelector("[data-scope]")?.getAttribute("data-scope") || "profile";
 
-    // Get root domain
-    const domain = window.location.host.split(".");
-    let access_id = domain[domain.length - 2] + "." + domain[domain.length - 1];
-    // Keep the port if it exists
-    if (window.location.port) {
-        access_id += ":" + window.location.port;
+    // Get root domain or the ip address if domain is not available
+    let domain = window.location.hostname || window.location.host;
+    // Remove the subdomain from the domain name and check if it's an ip address
+    const domainParts = domain.split(".");
+    if (domainParts.length > 2) {
+        domainParts.shift();
     }
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(access_id) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    if (isNaN(domainParts[0])) {
+        domain = domainParts.join(".");
+    }
+
+    // Add the port if it´s on the origin domain
+    if (window.location.port != "") {
+        domain += ":" + window.location.port;
+    }
+
+    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
 
     if (loginWindow == null) {
         new IntastellarSolutionsSDKError("Please enable popups for this website");
@@ -91,6 +102,14 @@ function signin() {
                     new IntastellarSolutionsSDKError("Invalid token issuer");
                 }
             })
+
+            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
+            if (issuerFromToken != intastellarIssuerUrl) {
+                new IntastellarSolutionsSDKError("Invalid token issuer");
+                return;
+            }
+            console.log(window.location.protocol);
+            window.location.href = "https://" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + t;
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
