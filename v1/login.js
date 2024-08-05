@@ -47,7 +47,7 @@ function signin() {
         try {
             // If this doesn't throw an exception, the page is loaded
             if (loginWindow.document) {
-                console.log("Popup window loaded.");
+                /* console.log("Popup window loaded."); */
             }
         } catch (e) {
             // The page is not loaded yet, ignore the security exception
@@ -67,8 +67,6 @@ function signin() {
         if (t != "") {
             loginWindow.postMessage("iframe-token-recieved", token.origin);
         }
-
-        console.log(t);
 
         if (document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null) {
             new IntastellarSolutionsSDKError("Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
@@ -122,7 +120,6 @@ function signin() {
                 })
             }).then(e => e.json()).then(e => {
                 if (e.status == 200) {
-                    console.log(e);
                     new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
                     fn(e.account);
                 } else {
