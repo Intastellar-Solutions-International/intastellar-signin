@@ -166,7 +166,7 @@ async function checkUserLogin() {
 }
 const styleSheet = document.createElement("link");
 styleSheet.rel = "stylesheet";
-styleSheet.href = "https://account.api.intastellarsolutions.com/insign/style.css";
+styleSheet.href = "https://account.api.intastellarsolutions.com/v1/insign/style.css";
 
 if (window.location.host == "localhost" || window.location.host.indexOf("127.0.0.1") > -1) {
     styleSheet.href = "./insign/style.css";
