@@ -77,7 +77,7 @@ function signin() {
             //loginWindow.close();
             // Check if current url has a query string
             const query = "?" + window.location.href.split("?")[1];
-            const token = JSON.parse(window.atob(t));
+            const token = t;
 
             fetch("https://apis.intastellaraccounts.com/verify.php", {
                 method: 'POST',
@@ -107,7 +107,7 @@ function signin() {
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
-            const token = JSON.parse(window.atob(t));
+            const token = t;
             fetch("https://apis.intastellaraccounts.com/verify.php", {
                 method: 'POST',
                 headers: {
