@@ -125,8 +125,8 @@ function signin() {
                 new IntastellarSolutionsSDKError("Invalid token issuer");
                 return;
             }
-
-            window.location.href = window.location.protocol + "://" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + t;
+            console.log(window.location.protocol);
+            window.location.href = "https://" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + t;
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
