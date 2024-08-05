@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login...</title>
 </head>
+
 <body>
     <script>
         const data = new URLSearchParams(window.location.search).get("token");
-        const decryptData = window.atob(data);
+        const decryptData = data;
         localStorage.setItem("user", decryptData);
     </script>
     <!--  -->
 </body>
+
 </html>
