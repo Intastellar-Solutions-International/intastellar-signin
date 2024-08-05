@@ -90,7 +90,7 @@ function signin() {
                     app: appName
                 })
             }).then(e => e.json()).then(e => {
-                if (e.status == 200) {
+                if (e.statusCode == 200) {
                     const t = e.account;
                     new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name);
                     if (window.location.href.indexOf("?") > -1) {
@@ -101,7 +101,7 @@ function signin() {
                         window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + "?token=" + JSON.stringify(t);
                     }
                 } else {
-                    new IntastellarSolutionsSDKError("Invalid token issuer");
+                    new IntastellarSolutionsSDKError(e.error);
                 }
             })
         } else if (document.querySelector("[data-login_callback]") != null) {
@@ -119,11 +119,11 @@ function signin() {
                     app: appName
                 })
             }).then(e => e.json()).then(e => {
-                if (e.status == 200) {
+                if (e.statusCode == 200) {
                     new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
                     fn(e.account);
                 } else {
-                    new IntastellarSolutionsSDKError("Invalid token issuer");
+                    new IntastellarSolutionsSDKError(e.error);
                 }
             })
         }
