@@ -60,18 +60,28 @@ class IntastellarSolutionsSDKSuccess extends Error {
 
 function signin() {
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
-    const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
+    const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
     const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
     const scope = document.querySelector("[data-scope]")?.getAttribute("data-scope") || "profile";
 
-    // Get root domain
-    const domain = window.location.host.split(".");
+    // Get root domain or the ip address if domain is not available
+    let domain = window.location.hostname || window.location.host;
+    // Remove the subdomain from the domain name and check if it's an ip address
+    const domainParts = domain.split(".");
+    if (domainParts.length > 2) {
+        domainParts.shift();
+    }
+    if (isNaN(domainParts[0])) {
+        domain = domainParts.join(".");
+    }
 
-    // If location is an IP address return the IP address else return the domain without the subdomain
-    const access_id = (domain.length == 4) ? domain[0] + "." + domain[1] + "." + domain[2] + "." + domain[3] : domain[0] + "." + domain[1];
+    // Add the port if it´s on the origin domain
+    if (window.location.port != "") {
+        domain += ":" + window.location.port;
+    }
 
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(access_id) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
 
     if (loginWindow == null) {
         new IntastellarSolutionsSDKError("Please enable popups for this website");
