@@ -59,6 +59,7 @@ class IntastellarSolutionsSDKSuccess extends Error {
 };
 
 function signin() {
+    const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
     const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
@@ -102,6 +103,12 @@ function signin() {
             // Check if current url has a query string
             const query = "?" + window.location.href.split("?")[1];
 
+            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
+            if (issuerFromToken != intastellarIssuerUrl) {
+                new IntastellarSolutionsSDKError("Invalid token issuer");
+                return;
+            }
+
             if (window.location.href.indexOf("?") > -1) {
                 const query = "?" + window.location.href.split("?")[1];
                 // Add the query string to the url
@@ -111,7 +118,14 @@ function signin() {
             }
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
-            new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name)
+            new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
+
+            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
+            if (issuerFromToken != intastellarIssuerUrl) {
+                new IntastellarSolutionsSDKError("Invalid token issuer");
+                return;
+            }
+
             fn(JSON.parse(window.atob(t)));
         }
     })

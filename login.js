@@ -59,12 +59,12 @@ class IntastellarSolutionsSDKSuccess extends Error {
 };
 
 function signin() {
+    const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
-    const rootDomain = location.hostname.split(".").slice(-2).join(".");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
     const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
     const scope = document.querySelector("[data-scope]")?.getAttribute("data-scope") || "profile";
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&access_id=" + rootDomain + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
 
     if (loginWindow == null) {
         new IntastellarSolutionsSDKError("Please enable popups for this website");
@@ -103,16 +103,29 @@ function signin() {
             // Check if current url has a query string
             const query = "?" + window.location.href.split("?")[1];
 
+            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
+            if (issuerFromToken != intastellarIssuerUrl) {
+                new IntastellarSolutionsSDKError("Invalid token issuer");
+                return;
+            }
+
             if (window.location.href.indexOf("?") > -1) {
                 const query = "?" + window.location.href.split("?")[1];
                 // Add the query string to the url
-                window.location.href = window.location.protocol + "//" + loginUri + query + "&token=" + t;
+                window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname + query + "&token=" + t;
             } else {
-                window.location.href = window.location.protocol + "//" + loginUri + "?token=" + t;
+                window.location.href = window.location.href + "?token=" + t;
             }
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
-            new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name)
+            new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
+
+            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
+            if (issuerFromToken != intastellarIssuerUrl) {
+                new IntastellarSolutionsSDKError("Invalid token issuer");
+                return;
+            }
+
             fn(JSON.parse(window.atob(t)));
         }
     })
