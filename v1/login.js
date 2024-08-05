@@ -63,7 +63,12 @@ function signin() {
     window.addEventListener("message", function (token) {
         const t = token.data;
         document.cookie = "c_name=" + JSON.parse(window.atob(t)).user_id + "; expire=; domain=" + window.location.host;
-        loginWindow.postMessage("iframe-token-recieved", token.origin);
+
+        if (t != "") {
+            loginWindow.postMessage("iframe-token-recieved", token.origin);
+        }
+
+        console.log(t);
 
         if (document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null) {
             new IntastellarSolutionsSDKError("Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
@@ -71,12 +76,12 @@ function signin() {
         }
 
         if (document.querySelector("[data-login_uri]") != null) {
-            loginWindow.close();
+            //loginWindow.close();
             // Check if current url has a query string
             const query = "?" + window.location.href.split("?")[1];
-            const token = JSON.parse(window.atob(t));;
+            const token = JSON.parse(window.atob(t));
 
-            fetch("https://apis.intastellaraccounts.com/verify", {
+            fetch("https://apis.intastellaraccounts.com/verify.php", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,28 +92,20 @@ function signin() {
                     app: appName
                 })
             }).then(e => e.json()).then(e => {
-                if (e.status == "success") {
+                if (e.status == 200) {
                     const t = e.account;
-                    new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
+                    new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name);
                     if (window.location.href.indexOf("?") > -1) {
                         const query = "?" + window.location.href.split("?")[1];
                         // Add the query string to the url
-                        window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname + query + "&token=" + t;
+                        window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + JSON.stringify(t);
                     } else {
-                        window.location.href = window.location.href + "?token=" + t;
+                        window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + "?token=" + JSON.stringify(t);
                     }
                 } else {
                     new IntastellarSolutionsSDKError("Invalid token issuer");
                 }
             })
-
-            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
-            if (issuerFromToken != intastellarIssuerUrl) {
-                new IntastellarSolutionsSDKError("Invalid token issuer");
-                return;
-            }
-            console.log(window.location.protocol);
-            window.location.href = "https://" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + t;
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
