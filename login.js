@@ -126,13 +126,7 @@ function signin() {
                 return;
             }
 
-            if (window.location.href.indexOf("?") > -1) {
-                const query = "?" + window.location.href.split("?")[1];
-                // Add the query string to the url
-                window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname + query + "&token=" + t;
-            } else {
-                window.location.href = window.location.href + "?token=" + t;
-            }
+            window.location.href = document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + t;
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
