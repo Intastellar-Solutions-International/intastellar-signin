@@ -1,49 +1,4 @@
 const intastellarLogoSrc = "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg";
-class IntastellarAccounts {
-    constructor() {
-        /* Intastellar API root for IntastellarA Accounts */
-        this.IntastellarAPIroot = "https://apis.intastellaraccounts.com";
-        /* Intastellar Login Url */
-        this.IntastellarAPILoginRoot = "https://www.intastellaraccounts.com";
-
-    }
-
-    /* Function to log the user in */
-    LogUserIn() {
-        const login = this.IntastellarAPILoginRoot + "/signin/v3/identifier";
-
-    }
-
-    /* Function to log the user out */
-    LogUserOut() {
-        const logout = this.IntastellarAPILoginRoot + "/signout/v3/identifier";
-        fetch(logout, {
-            method: 'GET',
-            credentials: "include",
-            mode: 'cors',
-        }).then(e => e.json()).then(e => {
-            console.log(e);
-        }).catch(e => {
-            console.log(e);
-        })
-
-    }
-
-    /* Function to get user profile information */
-    getPublicData() {
-        const publicData = this.IntastellarAPIroot + "/usercontent/js/getuser.php";
-        fetch(publicData, {
-            method: 'GET',
-            credentials: "include",
-            mode: 'cors',
-        }).then(e => e.json()).then(e => {
-            console.log(e);
-        }).catch(e => {
-            console.log(e);
-        })
-    }
-}
-
 class IntastellarSolutionsSDKError extends Error {
     constructor(message) {
         super(message);
@@ -119,6 +74,33 @@ function signin() {
             loginWindow.close();
             // Check if current url has a query string
             const query = "?" + window.location.href.split("?")[1];
+            const token = JSON.parse(window.atob(t));;
+
+            fetch("https://apis.intastellaraccounts.com/verify", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: token,
+                    origin: window.location.host,
+                    app: appName
+                })
+            }).then(e => e.json()).then(e => {
+                if (e.status == "success") {
+                    const t = e.account;
+                    new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
+                    if (window.location.href.indexOf("?") > -1) {
+                        const query = "?" + window.location.href.split("?")[1];
+                        // Add the query string to the url
+                        window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname + query + "&token=" + t;
+                    } else {
+                        window.location.href = window.location.href + "?token=" + t;
+                    }
+                } else {
+                    new IntastellarSolutionsSDKError("Invalid token issuer");
+                }
+            })
 
             const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
             if (issuerFromToken != intastellarIssuerUrl) {
@@ -130,14 +112,26 @@ function signin() {
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
-
-            const issuerFromToken = JSON.parse(window.atob(t)).issuer_url;
-            if (issuerFromToken != intastellarIssuerUrl) {
-                new IntastellarSolutionsSDKError("Invalid token issuer");
-                return;
-            }
-
-            fn(JSON.parse(window.atob(t)));
+            const token = JSON.parse(window.atob(t));
+            fetch("https://apis.intastellaraccounts.com/verify.php", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: token,
+                    origin: window.location.host,
+                    app: appName
+                })
+            }).then(e => e.json()).then(e => {
+                if (e.status == 200) {
+                    console.log(e);
+                    new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
+                    fn(e.account);
+                } else {
+                    new IntastellarSolutionsSDKError("Invalid token issuer");
+                }
+            })
         }
     })
 }
@@ -175,7 +169,7 @@ styleSheet.rel = "stylesheet";
 styleSheet.href = "https://account.api.intastellarsolutions.com/insign/style.css";
 
 if (window.location.host == "localhost" || window.location.host.indexOf("127.0.0.1") > -1) {
-    styleSheet.href = "/insign/style.css";
+    styleSheet.href = "./insign/style.css";
 }
 
 document.head.appendChild(styleSheet);
