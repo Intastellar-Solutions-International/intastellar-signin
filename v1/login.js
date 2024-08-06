@@ -62,6 +62,7 @@ function signin() {
 
     window.addEventListener("message", function (token) {
         const t = token.data;
+        //sessionStorage.setItem("intastellar_token", t);
         document.cookie = "c_name=" + JSON.parse(window.atob(t)).user_id + "; expire=; domain=" + window.location.host;
 
         if (t != "") {
@@ -130,6 +131,37 @@ function signin() {
     })
 }
 
+function checkToken() {
+    const token = sessionStorage.getItem("intastellar_token");
+    if (token != null) {
+        return token;
+    } else {
+        return null;
+    }
+}
+
+function loginViaToken() {
+    const token = checkToken();
+    if (token != null) {
+        fetch("https://apis.intastellaraccounts.com/verify", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: token,
+                origin: window.location.host
+            })
+        }).then(e => e.json()).then(e => {
+            if (e.statusCode == 200) {
+                new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
+                return e.account;
+            } else {
+                new IntastellarSolutionsSDKError(e.error);
+            }
+        })
+    }
+}
 /* Check user loggedin status on intastellaraccounts.com */
 
 async function checkUserLogin() {
