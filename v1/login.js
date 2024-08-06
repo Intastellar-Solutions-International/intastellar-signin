@@ -62,6 +62,7 @@ function signin() {
 
     window.addEventListener("message", function (token) {
         const t = token.data;
+        //sessionStorage.setItem("intastellar_token", t);
         document.cookie = "c_name=" + JSON.parse(window.atob(t)).user_id + "; expire=; domain=" + window.location.host;
 
         if (t != "") {
@@ -130,6 +131,37 @@ function signin() {
     })
 }
 
+function checkToken() {
+    const token = sessionStorage.getItem("intastellar_token");
+    if (token != null) {
+        return token;
+    } else {
+        return null;
+    }
+}
+
+function loginViaToken() {
+    const token = checkToken();
+    if (token != null) {
+        fetch("https://apis.intastellaraccounts.com/verify", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: token,
+                origin: window.location.host
+            })
+        }).then(e => e.json()).then(e => {
+            if (e.statusCode == 200) {
+                new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
+                return e.account;
+            } else {
+                new IntastellarSolutionsSDKError(e.error);
+            }
+        })
+    }
+}
 /* Check user loggedin status on intastellaraccounts.com */
 
 async function checkUserLogin() {
@@ -161,20 +193,15 @@ async function checkUserLogin() {
         new IntastellarSolutionsSDKError("User not logged in");
     })
 }
-const styleSheet = document.createElement("link");
-styleSheet.rel = "stylesheet";
-styleSheet.href = "https://account.api.intastellarsolutions.com/v1/insign/style.css";
-
-if (window.location.host == "localhost" || window.location.host.indexOf("127.0.0.1") > -1) {
-    styleSheet.href = "./insign/style.css";
-}
-
-document.head.appendChild(styleSheet);
 
 const Intastellar = {
     accounts: {
         id: {
             renderButton(element, theme = {}) {
+                const styleSheet = document.createElement("link");
+                styleSheet.rel = "stylesheet";
+                styleSheet.href = "https://account.api.intastellarsolutions.com/v1/insign/style.css";
+                document.head.appendChild(styleSheet);
                 const IntastellarButtonContainer = document.getElementById(element);
                 const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                 const IntastellarSigninButton = document.createElement("button");
