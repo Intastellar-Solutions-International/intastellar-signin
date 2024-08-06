@@ -88,6 +88,10 @@ function signin() {
                 }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
+                    const { phone, birthday } = e.account.user[0];
+                    e.account.user.phone = phone;
+                    e.account.user.birthday = birthday;
+                    delete e.account.user[0];
                     const t = e.account;
                     new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name);
                     if (window.location.href.indexOf("?") > -1) {
@@ -114,6 +118,10 @@ function signin() {
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
                     new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
+                    const { phone, birthday } = e.account.user[0];
+                    e.account.user.phone = phone;
+                    e.account.user.birthday = birthday;
+                    delete e.account.user[0];
                     fn(e.account);
                 } else {
                     new IntastellarSolutionsSDKError(e.error);
