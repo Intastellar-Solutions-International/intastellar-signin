@@ -62,8 +62,6 @@ function signin() {
 
     window.addEventListener("message", function (token) {
         const t = token.data;
-        //sessionStorage.setItem("intastellar_token", t);
-        document.cookie = "c_name=" + JSON.parse(window.atob(t)).user_id + "; expire=; domain=" + window.location.host;
 
         if (t != "") {
             loginWindow.postMessage("iframe-token-recieved", token.origin);
@@ -107,7 +105,6 @@ function signin() {
             })
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
-            new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
             const token = t;
             fetch("https://apis.intastellaraccounts.com/verify", {
                 method: 'GET',
@@ -117,7 +114,6 @@ function signin() {
                 }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
-                    new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
                     const { phone, birthday } = e.account.user[0];
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
