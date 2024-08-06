@@ -81,15 +81,11 @@ function signin() {
             const token = t;
 
             fetch("https://apis.intastellaraccounts.com/verify", {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: token,
-                    origin: window.location.host,
-                    app: appName
-                })
+                    'Authorization': 'Bearer ' + token
+                }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
                     const t = e.account;
@@ -110,15 +106,11 @@ function signin() {
             new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
             const token = t;
             fetch("https://apis.intastellaraccounts.com/verify", {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: token,
-                    origin: window.location.host,
-                    app: appName
-                })
+                    'Authorization': 'Bearer ' + token
+                }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
                     new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + JSON.parse(window.atob(t)).name);
@@ -148,10 +140,7 @@ function loginViaToken() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                token: token,
-                origin: window.location.host
-            })
+            body: token
         }).then(e => e.json()).then(e => {
             if (e.statusCode == 200) {
                 new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
