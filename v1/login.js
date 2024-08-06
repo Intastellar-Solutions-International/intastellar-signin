@@ -150,10 +150,10 @@ async function checkUserLogin() {
             intastellarLogo.classList.add("reverse");
         }
         if (type == null || type == undefined || type == "") {
-            intastellarSignInInfo.innerHTML = "Sign in as " + user.name + "<br>";
+            intastellarSignInInfo.innerHTML = "Sign in as " + user.name;
             intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
         } else if (type == "signup") {
-            intastellarSignInInfo.innerHTML = "Sign up as " + user.name + "<br>";
+            intastellarSignInInfo.innerHTML = "Sign up as " + user.name;
             intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
         }
         loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";

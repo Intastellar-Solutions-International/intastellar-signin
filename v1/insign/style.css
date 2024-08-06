@@ -32,7 +32,7 @@
 .intastellar-userProfile {
     width: 30px;
     height: 30px;
-    margin-right: 5px;
+    margin-right: 10px;
     border-radius: 50%;
     object-fit: cover;
     order: -1;
@@ -49,7 +49,7 @@
 }
 
 .intastellar-logo {
-    width: 40px;
+    width: 50px;
     margin-right: 5px;
 }
 
@@ -59,4 +59,5 @@
 
 .email {
     font-size: 11px;
+    display: block;
 }
