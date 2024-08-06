@@ -193,20 +193,15 @@ async function checkUserLogin() {
         new IntastellarSolutionsSDKError("User not logged in");
     })
 }
-const styleSheet = document.createElement("link");
-styleSheet.rel = "stylesheet";
-styleSheet.href = "https://account.api.intastellarsolutions.com/v1/insign/style.css";
-
-if (window.location.host == "localhost" || window.location.host.indexOf("127.0.0.1") > -1) {
-    styleSheet.href = "./insign/style.css";
-}
-
-document.head.appendChild(styleSheet);
 
 const Intastellar = {
     accounts: {
         id: {
             renderButton(element, theme = {}) {
+                const styleSheet = document.createElement("link");
+                styleSheet.rel = "stylesheet";
+                styleSheet.href = "https://account.api.intastellarsolutions.com/v1/insign/style.css";
+                document.head.appendChild(styleSheet);
                 const IntastellarButtonContainer = document.getElementById(element);
                 const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                 const IntastellarSigninButton = document.createElement("button");
