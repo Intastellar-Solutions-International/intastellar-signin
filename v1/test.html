@@ -39,17 +39,17 @@
             localStorage.setItem("user", JSON.stringify(token));
             document.querySelector("#profileImage").src = token.user.avatar;
             document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.user.name.firstName + "</h1>";
-            document.querySelector("#user-info").innerHTML += "<p>" + token.user?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.user?.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p>" + token.user.email + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p>" + token.user?.scope.birthday + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>" + token.user?.birthday + "</p>";
         }
 
         if (localStorage.getItem("user")) {
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).user.avatar;
             document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).user.name.firstName + "</h1>";
-            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.scope.phone + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user.email + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.scope.birthday + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.birthday + "</p>";
         }
     </script>
 </body>
