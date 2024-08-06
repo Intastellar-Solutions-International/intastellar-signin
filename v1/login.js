@@ -133,10 +133,13 @@ function signin() {
 /* Check user loggedin status on intastellaraccounts.com */
 
 async function checkUserLogin() {
-    await fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser.php?origin=" + window.location.host, {
+    await fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser?origin=" + window.location.host, {
         method: 'GET',
         credentials: "include",
         mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+        }
     }).then(e => e.json()).then(e => {
         const user = e.user;
         const loginbtn = document.querySelector(".IntastellarSignin");
