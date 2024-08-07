@@ -39,7 +39,7 @@ function signin() {
     const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
 
     if (loginWindow == null) {
-        new IntastellarSolutionsSDKError("Please enable popups for this website");
+      throw  new IntastellarSolutionsSDKError("Please enable popups for this website");
         return;
     }
 
@@ -91,7 +91,7 @@ function signin() {
                     e.account.user.birthday = birthday;
                     delete e.account.user[0];
                     const t = e.account;
-                    new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name);
+                    throw new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name);
                     if (window.location.href.indexOf("?") > -1) {
                         const query = "?" + window.location.href.split("?")[1];
                         // Add the query string to the url
@@ -100,7 +100,7 @@ function signin() {
                         window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + "?token=" + JSON.stringify(t);
                     }
                 } else {
-                    new IntastellarSolutionsSDKError(e.error);
+                    throw new IntastellarSolutionsSDKError(e.error);
                 }
             })
         } else if (document.querySelector("[data-login_callback]") != null) {
@@ -120,7 +120,7 @@ function signin() {
                     delete e.account.user[0];
                     fn(e.account);
                 } else {
-                    new IntastellarSolutionsSDKError(e.error);
+                    throw new IntastellarSolutionsSDKError(e.error);
                 }
             })
         }
@@ -150,7 +150,7 @@ function loginViaToken() {
                 new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
                 return e.account;
             } else {
-                new IntastellarSolutionsSDKError(e.error);
+                throw new IntastellarSolutionsSDKError(e.error);
             }
         })
     }
