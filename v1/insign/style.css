@@ -46,6 +46,7 @@
 
 .intastellarSignIn-info {
     font-size: 15px;
+    color: #6e6e6e;
 }
 
 .intastellar-logo {
@@ -133,6 +134,12 @@
 .intastellar-popup-header-email {
     font-size: 12px;
     color: #7c7c7c;
+}
+
+.intastellarSignIn-title {
+    font-size: 20px;
+    font-weight: 300;
+    color: #272727;
 }
 
 .intastellar-popup-header-info {
