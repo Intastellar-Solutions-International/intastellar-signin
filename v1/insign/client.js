@@ -229,7 +229,7 @@ const Intastellar = {
 
                 intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
                     <section>
-                        <p class="intastellarSignIn-title">Sign into ${appName} with your Intastellar Account</p>
+                        <p class="intastellarSignIn-title">Sign into '${appName}' with your Intastellar Account</p>
                         <p class="intastellarSignIn-info">
                             You can use your Intastellar account to sign into ${appName}.
                         </p>
