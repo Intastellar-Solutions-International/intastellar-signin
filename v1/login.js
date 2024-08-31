@@ -208,7 +208,7 @@ const Intastellar = {
                 const intastellarPopup = document.createElement("div");
                 const intastellarPopupShadow = document.createElement("div");
                 intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
-                intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'");
+                /* intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'"); */
                 intastellarPopupShadow.appendChild(intastellarPopup);
                 intastellarPopup.setAttribute("class", "intastellar-popup");
                 const intastellarPopupContent = document.createElement("div");
@@ -216,6 +216,9 @@ const Intastellar = {
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
                             <p class="header-info">Sign into ${appName} with Intastellar</p>
+                            <button class="close-popup" onclick="document.querySelector('.intastellar-popup').style.bottom = '-100%'; document.querySelector('.intastellar-popup-shadow').style.visibility = 'hidden'">
+                                <svg class="Bz112c Bz112c-r9oPif" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path><path fill="none" d="M0 0h24v24H0z"></path></svg>
+                            </button>
                         </header>`;
 
                 intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
@@ -293,11 +296,3 @@ const Intastellar = {
         }
     }
 }
-
-document.addEventListener("click", function (e) {
-    const intastellarPopup = document.querySelector(".intastellar-popup");
-    // check if e.target is inside or is the popup
-    if (intastellarPopup && !intastellarPopup.contains(e.target)) {
-
-    }
-}, false);
