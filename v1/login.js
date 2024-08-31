@@ -65,7 +65,6 @@ function signin() {
 
         if (t != "") {
             loginWindow.postMessage("iframe-token-recieved", token.origin);
-            document.querySelector(".intastellar-popup").style.display = "none";
         }
 
         if (document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null) {
@@ -156,6 +155,7 @@ function loginViaToken() {
         })
     }
 }
+
 /* Check user loggedin status on intastellaraccounts.com */
 
 const Intastellar = {
@@ -233,6 +233,10 @@ const Intastellar = {
                         loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
                     } else {
                         const intastellarPopup = document.createElement("div");
+                        const intastellarPopupShadow = document.createElement("div");
+                        intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
+                        intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'");
+                        intastellarPopupShadow.appendChild(intastellarPopup);
                         intastellarPopup.setAttribute("class", "intastellar-popup");
                         const intastellarPopupContent = document.createElement("div");
                         intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
@@ -250,7 +254,7 @@ const Intastellar = {
                         intastellarPopupContent.appendChild(intastellarPopupButton);
                         intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
                         intastellarPopup.appendChild(intastellarPopupContent);
-                        document.body.appendChild(intastellarPopup);
+                        document.body.appendChild(intastellarPopupShadow);
                     }
 
                 }).catch(e => {
@@ -264,7 +268,10 @@ const Intastellar = {
                         if (window.innerWidth > 768) {
                             signin();
                         } else {
-                            document.querySelector(".intastellar-popup").style.display = "block";
+                            document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                            setTimeout(() => {
+                                document.querySelector(".intastellar-popup").style.bottom = "0";
+                            }, 100);
                         }
                     });
                 }
@@ -272,3 +279,11 @@ const Intastellar = {
         }
     }
 }
+
+document.addEventListener("click", function (e) {
+    const intastellarPopup = document.querySelector(".intastellar-popup");
+    // check if e.target is inside or is the popup
+    if (intastellarPopup && !intastellarPopup.contains(e.target)) {
+
+    }
+}, false);
