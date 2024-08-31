@@ -175,6 +175,7 @@ const Intastellar = {
                 const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                 const IntastellarSigninButton = document.createElement("button");
                 const IntastellarText = document.createElement("div");
+                const intastellarPopup = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
                 if (type == null || type == undefined || type == "" || type == "intastellar") {
                     IntastellarText.innerHTML = "Sign in with Intastellar"
@@ -183,10 +184,11 @@ const Intastellar = {
                 }
 
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
-
+                intastellarPopup.setAttribute("class", "intastellar-popup");
                 if (theme != null || theme != undefined) {
                     if (theme.theme == "dark") {
                         IntastellarSigninButton.classList.add("dark");
+                        intastellarPopup.classList.add("dark");
                     }
 
                     if (theme.scopes != null || theme.scopes != undefined) {
@@ -205,12 +207,10 @@ const Intastellar = {
                 IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button.php?v=" + Math.random());
                 const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
 
-                const intastellarPopup = document.createElement("div");
                 const intastellarPopupShadow = document.createElement("div");
                 intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
                 /* intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'"); */
                 intastellarPopupShadow.appendChild(intastellarPopup);
-                intastellarPopup.setAttribute("class", "intastellar-popup");
                 const intastellarPopupContent = document.createElement("div");
                 intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">

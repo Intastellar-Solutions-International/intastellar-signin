@@ -49,6 +49,10 @@
     color: #6e6e6e;
 }
 
+.dark .intastellarSignIn-info {
+    color: #a5a5a5;
+}
+
 .intastellar-logo {
     width: 50px;
     margin-right: 5px;
@@ -88,6 +92,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all .5s ease-in-out;
 }
 
 .Bz112c-r9oPif {
@@ -97,6 +102,14 @@
 
 .close-popup:hover {
     background-color: #e6e6e6;
+}
+
+.dark .close-popup:hover {
+    background-color: #6e6e6e;
+}
+
+.dark .Bz112c-r9oPif {
+    fill: #c8c8c8;
 }
 
 .intastellar-popup {
@@ -170,6 +183,15 @@
 .intastellar-popup-header-info {
     margin-left: 10px;
     color: #272727;
+}
+
+.dark .intastellar-popup-header-info {
+    color: #fff;
+}
+
+.dark .intastellar-popup-header-email,
+.dark .header-info {
+    color: #a5a5a5;
 }
 
 .intastellar-popup-header-info p {
