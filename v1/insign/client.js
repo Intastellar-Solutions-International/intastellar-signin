@@ -1,3 +1,12 @@
+/* 
+Sign in with Intastellar
+Author: Intastellar Solutions
+Version: 1.5.0
+https://www.intastellarsolutions.com
+
+This script allows you to add a sign in with Intastellar button to your website.
+Copyright (c) 2024 Intastellar Solutions, International
+*/
 const intastellarLogoSrc = "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg";
 class IntastellarSolutionsSDKError extends Error {
     constructor(message) {
