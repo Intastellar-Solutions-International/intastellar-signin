@@ -55,7 +55,8 @@ function signin() {
         }
         // Check if the window is closed
         if (loginWindow.closed) {
-            /* console.log("Popup window closed."); */
+            // If the window is closed
+
             clearInterval(checkLoadedAndClosed);
         }
     }, 1000);
@@ -73,7 +74,6 @@ function signin() {
         }
 
         if (document.querySelector("[data-login_uri]") != null) {
-            //loginWindow.close();
             // Check if current url has a query string
             const query = "?" + window.location.href.split("?")[1];
             const token = t;
@@ -203,6 +203,37 @@ const Intastellar = {
                 const IntastellarSigniniFrame = document.createElement("iframe");
                 IntastellarSigniniFrame.setAttribute("id", "intastellar-signin-iframe");
                 IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button.php?v=" + Math.random());
+                const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
+
+                const intastellarPopup = document.createElement("div");
+                const intastellarPopupShadow = document.createElement("div");
+                intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
+                intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'");
+                intastellarPopupShadow.appendChild(intastellarPopup);
+                intastellarPopup.setAttribute("class", "intastellar-popup");
+                const intastellarPopupContent = document.createElement("div");
+                intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
+                intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
+                            <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
+                            <p class="header-info">Sign into ${appName} with Intastellar</p>
+                        </header>`;
+
+                intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
+                        <img src="https://scontent-uc-d2c-7.intastellar.com/a/s/ul/p/avtr46-img/profile_standard.jpg" class="intastellar-popup-userProfile">
+                        <div class="intastellar-popup-header-info">
+                            <p class="intastellar-popup-userName">To continue signin in with Intastellar Solutions, please first sign in.</p>
+                        </div>
+                </div>`;
+
+                const intastellarPopupButton = document.createElement("button");
+                intastellarPopupButton.innerHTML = "Sign in with Intastellar";
+                intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
+                intastellarPopupButton.setAttribute("onclick", "signin()");
+
+                intastellarPopupContent.appendChild(intastellarPopupButton);
+                intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
+                intastellarPopup.appendChild(intastellarPopupContent);
+                document.body.appendChild(intastellarPopupShadow);
 
                 fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser?origin=" + window.location.host, {
                     method: 'GET',
@@ -215,7 +246,6 @@ const Intastellar = {
                     const user = e.user;
                     const loginbtn = document.querySelector(".IntastellarSignin");
                     const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
-                    const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
                     const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
                     const intastellarLogo = document.querySelector(".intastellar-logo");
 
@@ -232,29 +262,10 @@ const Intastellar = {
                         }
                         loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
                     } else {
-                        const intastellarPopup = document.createElement("div");
-                        const intastellarPopupShadow = document.createElement("div");
-                        intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
-                        intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'");
-                        intastellarPopupShadow.appendChild(intastellarPopup);
-                        intastellarPopup.setAttribute("class", "intastellar-popup");
-                        const intastellarPopupContent = document.createElement("div");
-                        intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
-                        intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
-				<img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
-				<p class="header-info">Sign into ${appName} with Intastellar</p>
-			</header>`;
-                        intastellarPopupContent.innerHTML += "<div class='intastellar-popup-header'><img src='" + user.image + "'><div class='intastellar-popup-header-info'><p class='intastellar-popup-header-name'>" + user.name.first + " " + user.name.last + "</p><p class='intastellar-popup-header-email'>" + user.email + "</p></div></div>";
-
-                        const intastellarPopupButton = document.createElement("button");
-                        intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
-                        intastellarPopupButton.setAttribute("onclick", "signin()");
-                        intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
-
-                        intastellarPopupContent.appendChild(intastellarPopupButton);
-                        intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
-                        intastellarPopup.appendChild(intastellarPopupContent);
-                        document.body.appendChild(intastellarPopupShadow);
+                        if (user) {
+                            document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
+                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
+                        }
                     }
 
                 }).catch(e => {
