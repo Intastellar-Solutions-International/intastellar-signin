@@ -180,6 +180,10 @@
     color: #272727;
 }
 
+.dark .intastellarSignIn-title {
+    color: #fff;
+}
+
 .intastellar-popup-header-info {
     margin-left: 10px;
     color: #272727;
