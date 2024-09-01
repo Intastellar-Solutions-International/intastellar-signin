@@ -22,7 +22,7 @@ class IntastellarSolutionsSDKSuccess extends Error {
     }
 };
 
-function signin() {
+function signin(email) {
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
@@ -45,7 +45,12 @@ function signin() {
         domain += ":" + window.location.port;
     }
 
-    const loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    let loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    if (email != null) {
+        loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&identifier=" + email + "&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+
+    }
+
 
     if (loginWindow == null) {
         throw new IntastellarSolutionsSDKError("Please enable popups for this website");
@@ -281,6 +286,10 @@ const Intastellar = {
                         }
                         loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
                     } else {
+
+                        if (user && user2.length == 0) {
+                            document.querySelector(".intastellar-popup-button").setAttribute("onclick", "signin('" + user.email + "')");
+                        }
 
                         if (user) {
                             document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
