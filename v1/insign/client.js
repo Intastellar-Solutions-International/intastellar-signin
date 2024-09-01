@@ -97,6 +97,10 @@ function signin(email) {
 
     window.addEventListener("message", function (token) {
         const t = token.data;
+        const expires = new Date();
+        // Set the expiration date to 2 years
+        expires.setFullYear(expires.getFullYear() + 2);
+        domain = domain.split(":")[0];
 
         if (t != "") {
             loginWindow.postMessage("iframe-token-recieved", token.origin);
@@ -127,7 +131,7 @@ function signin(email) {
                     const t = e.account;
                     const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
                     console.log(success.getCustomSuccessMessage());
-                    sessionStorage.setItem("intastellar_token", token);
+                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + ";"
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     if (window.location.href.indexOf("?") > -1) {
                         const query = "?" + window.location.href.split("?")[1];
@@ -157,7 +161,9 @@ function signin(email) {
                     delete e.account.user[0];
                     const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
                     console.log(success.getCustomSuccessMessage());
-                    sessionStorage.setItem("intastellar_token", token);
+
+                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + ";"
+
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     fn(e.account);
                 } else {
@@ -254,7 +260,7 @@ const Intastellar = {
                 /* intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'"); */
                 intastellarPopupShadow.appendChild(intastellarPopup);
 
-                if (sessionStorage.getItem("intastellar_token") != null) {
+                if (getCookie("inta_acc") != null) {
                     console.log("User is logged in");
                     intastellarPopupShadow.setAttribute("style", "visibility: hidden");
                 }
@@ -357,7 +363,7 @@ const Intastellar = {
                             if (window.innerWidth > 768) {
                                 signin();
                             } else {
-                                if (sessionStorage.getItem("intastellar_token") == null) {
+                                if (getCookie("inta_acc") == null) {
                                     document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
                                     setTimeout(() => {
                                         document.querySelector(".intastellar-popup").style.bottom = "0";
@@ -366,7 +372,7 @@ const Intastellar = {
                             }
                         })
                     } else {
-                        if (sessionStorage.getItem("intastellar_token") == null) {
+                        if (getCookie("inta_acc") == null) {
                             document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
                         }
                     }
