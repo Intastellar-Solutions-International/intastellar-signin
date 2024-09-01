@@ -30,7 +30,7 @@
             {
                 'theme': 'dark',
                 'scopes': ['phone', 'birthday', "design"],
-                'picker': 'button',
+                'picker': 'popup',
             }
         )
 
@@ -45,12 +45,18 @@
             document.querySelector("#user-info").innerHTML += "<p>" + token.user?.birthday + "</p>";
         }
 
+        function signout() {
+            Intastellar.accounts.id.logout();
+            localStorage.removeItem("user");
+        }
+
         if (localStorage.getItem("user")) {
             document.querySelector("#profileImage").src = JSON.parse(localStorage.getItem("user")).user.avatar;
             document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).user.name.firstName + "</h1>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user.email + "</p>";
             document.querySelector("#user-info").innerHTML += "<p> " + JSON.parse(localStorage.getItem("user")).user?.birthday + "</p>";
+            document.querySelector("#user-info").innerHTML += "<button onClick='signout()'>Logout</button>";
         }
     </script>
 </body>

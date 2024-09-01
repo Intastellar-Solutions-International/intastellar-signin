@@ -67,8 +67,8 @@ function closeSignIn() {
 function signin(email) {
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
-    const appName = document.querySelector("[data-app-name]").getAttribute("data-app-name");
-    const key = document.querySelector("[data-client_id]").getAttribute("data-client_id");
+    const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
+    const key = document.querySelector("[data-client_id]")?.getAttribute("data-client_id");
     const scope = document.querySelector("[data-scope]")?.getAttribute("data-scope") || "profile";
 
     // Get root domain or the ip address if domain is not available
