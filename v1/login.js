@@ -131,7 +131,7 @@ function signin(email) {
                     const t = e.account;
                     const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
                     console.log(success.getCustomSuccessMessage());
-                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + ";"
+                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + "; path=/";
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     if (window.location.href.indexOf("?") > -1) {
                         const query = "?" + window.location.href.split("?")[1];
@@ -162,7 +162,7 @@ function signin(email) {
                     const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
                     console.log(success.getCustomSuccessMessage());
 
-                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + ";"
+                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + "; path=/";
 
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     fn(e.account);
