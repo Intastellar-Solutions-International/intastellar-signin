@@ -237,7 +237,7 @@ const Intastellar = {
                 if (theme.picker == "popup") {
                     intastellarPopupShadow.classList.add("top-left");
                     intastellarPopup.classList.add("top-left");
-                    intastellarPopup.setAttribute("data-scope", theme.scopes)
+                    intastellarPopup.setAttribute("data-scope", theme.scopes || "profile");
                 }
 
                 const intastellarPopupContent = document.createElement("div");
