@@ -275,7 +275,12 @@ const Intastellar = {
                 const IntastellarSigniniFrame = document.createElement("iframe");
                 IntastellarSigniniFrame.setAttribute("id", "intastellar-signin-iframe");
                 IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button.php?v=" + Math.random());
-                const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
+                let appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
+                if (theme.picker == "popup" && theme.appName != null) {
+                    appName = theme.appName;
+                } else {
+                    appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
+                }
 
                 const intastellarPopupShadow = document.createElement("div");
                 intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
