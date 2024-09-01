@@ -61,7 +61,7 @@ function closeSignIn() {
     expires.setFullYear(expires.getFullYear() + 2);
     domain = domain.split(":")[0];
 
-    document.cookie = "inta_state=; expires=" + expires + "; domain=" + domain + "; path=/";
+    document.cookie = "inta_state=1; expires=" + expires + "; domain=" + domain + "; path=/";
 }
 
 function signin(email) {
@@ -323,6 +323,10 @@ const Intastellar = {
                 intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
                 intastellarPopup.appendChild(intastellarPopupContent);
                 document.body.appendChild(intastellarPopupShadow);
+                if (getCookie("inta_state") == "1" && theme.picker == "popup") {
+                    console.log("Hide popup");
+                    document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
+                }
 
                 fetch("https://apis.intastellaraccounts.com/usercontent/js/getuser?origin=" + window.location.host, {
                     method: 'GET',
@@ -391,9 +395,10 @@ const Intastellar = {
                             }
                         })
                     } else {
-                        console.log("Popup");
                         if (getCookie("inta_acc") == null) {
-                            document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                            if (getCookie("inta_state") != "1" && theme.picker == "popup") {
+                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                            }
                         }
                     }
                 }
