@@ -379,6 +379,21 @@ const Intastellar = {
                 }
             },
             logout() {
+                // Get root domain or the ip address if domain is not available
+                let domain = window.location.hostname || window.location.host;
+                // Remove the subdomain from the domain name and check if it's an ip address
+                const domainParts = domain.split(".");
+                if (domainParts.length > 2) {
+                    domainParts.shift();
+                }
+                if (isNaN(domainParts[0])) {
+                    domain = domainParts.join(".");
+                }
+
+                // Add the port if it´s on the origin domain
+                if (window.location.port != "") {
+                    domain += ":" + window.location.port;
+                }
                 document.cookie = "inta_acc=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + domain + ";";
             },
         }
