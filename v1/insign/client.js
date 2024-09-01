@@ -7,24 +7,6 @@ https://www.intastellarsolutions.com
 This script allows you to add a sign in with Intastellar button to your website.
 Copyright (c) 2024 Intastellar Solutions, International
 */
-/* 
-Sign in with Intastellar
-Author: Intastellar Solutions
-Version: 1.5.0
-https://www.intastellarsolutions.com
-
-This script allows you to add a sign in with Intastellar button to your website.
-Copyright (c) 2024 Intastellar Solutions, International
-*/
-/* 
-Sign in with Intastellar
-Author: Intastellar Solutions
-Version: 1.5.0
-https://www.intastellarsolutions.com
-
-This script allows you to add a sign in with Intastellar button to your website.
-Copyright (c) 2024 Intastellar Solutions, International
-*/
 const intastellarLogoSrc = "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg";
 class IntastellarSolutionsSDKError extends Error {
     constructor(message) {
@@ -33,12 +15,22 @@ class IntastellarSolutionsSDKError extends Error {
     }
 };
 
-class IntastellarSolutionsSDKSuccess extends Error {
+class IntastellarSolutionsSDKSuccess {
     constructor(message) {
-        super(message);
-        this.name = 'IntastellarSolutionsSDK';
+        this.message = message;
+        this.name = 'IntastellarSolutionsSDKSuccess';
     }
-};
+
+    getCustomSuccessMessage() {
+        return `Success: ${this.message}`;
+    }
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
 
 function closeSignIn() {
     if (window.innerWidth <= 768) {
@@ -133,6 +125,10 @@ function signin(email) {
                     e.account.user.birthday = birthday;
                     delete e.account.user[0];
                     const t = e.account;
+                    const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
+                    console.log(success.getCustomSuccessMessage());
+                    sessionStorage.setItem("intastellar_token", token);
+                    document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     if (window.location.href.indexOf("?") > -1) {
                         const query = "?" + window.location.href.split("?")[1];
                         // Add the query string to the url
@@ -140,7 +136,6 @@ function signin(email) {
                     } else {
                         window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + "?token=" + JSON.stringify(t);
                     }
-                    throw new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name);
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
                 }
@@ -160,6 +155,10 @@ function signin(email) {
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
                     delete e.account.user[0];
+                    const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
+                    console.log(success.getCustomSuccessMessage());
+                    sessionStorage.setItem("intastellar_token", token);
+                    document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     fn(e.account);
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
@@ -189,7 +188,8 @@ function loginViaToken() {
             body: token
         }).then(e => e.json()).then(e => {
             if (e.statusCode == 200) {
-                new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
+                const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
+                console.log(success.getCustomSuccessMessage());
                 return e.account;
             } else {
                 throw new IntastellarSolutionsSDKError(e.error);
@@ -253,6 +253,12 @@ const Intastellar = {
                 intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
                 /* intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'"); */
                 intastellarPopupShadow.appendChild(intastellarPopup);
+
+                if (sessionStorage.getItem("intastellar_token") != null) {
+                    console.log("User is logged in");
+                    intastellarPopupShadow.setAttribute("style", "visibility: hidden");
+                }
+
                 if (theme.picker == "popup") {
                     intastellarPopupShadow.classList.add("top-left");
                     intastellarPopup.classList.add("top-left");
@@ -351,14 +357,18 @@ const Intastellar = {
                             if (window.innerWidth > 768) {
                                 signin();
                             } else {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                                setTimeout(() => {
-                                    document.querySelector(".intastellar-popup").style.bottom = "0";
-                                }, 100);
+                                if (sessionStorage.getItem("intastellar_token") == null) {
+                                    document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                                    setTimeout(() => {
+                                        document.querySelector(".intastellar-popup").style.bottom = "0";
+                                    }, 100);
+                                }
                             }
                         })
                     } else {
-                        document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                        if (sessionStorage.getItem("intastellar_token") == null) {
+                            document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                        }
                     }
                 }
             }
