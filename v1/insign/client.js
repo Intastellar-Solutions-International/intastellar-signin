@@ -261,7 +261,6 @@ const Intastellar = {
                 intastellarPopupShadow.appendChild(intastellarPopup);
 
                 if (getCookie("inta_acc") != null) {
-                    console.log("User is logged in");
                     intastellarPopupShadow.setAttribute("style", "visibility: hidden");
                 }
 
@@ -363,15 +362,14 @@ const Intastellar = {
                             if (window.innerWidth > 768) {
                                 signin();
                             } else {
-                                if (getCookie("inta_acc") == null) {
-                                    document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                                    setTimeout(() => {
-                                        document.querySelector(".intastellar-popup").style.bottom = "0";
-                                    }, 100);
-                                }
+                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                                setTimeout(() => {
+                                    document.querySelector(".intastellar-popup").style.bottom = "0";
+                                }, 100);
                             }
                         })
                     } else {
+                        console.log("Popup");
                         if (getCookie("inta_acc") == null) {
                             document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
                         }
