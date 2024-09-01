@@ -40,6 +40,28 @@ function closeSignIn() {
         document.querySelector('.intastellar-popup').style.right = '-100%';
         document.querySelector('.intastellar-popup-shadow').style.visibility = 'hidden'
     }
+
+    // Get root domain or the ip address if domain is not available
+    let domain = window.location.hostname || window.location.host;
+    // Remove the subdomain from the domain name and check if it's an ip address
+    const domainParts = domain.split(".");
+    if (domainParts.length > 2) {
+        domainParts.shift();
+    }
+    if (isNaN(domainParts[0])) {
+        domain = domainParts.join(".");
+    }
+
+    // Add the port if it´s on the origin domain
+    if (window.location.port != "") {
+        domain += ":" + window.location.port;
+    }
+    const expires = new Date();
+    // Set the expiration date to 2 years
+    expires.setFullYear(expires.getFullYear() + 2);
+    domain = domain.split(":")[0];
+
+    document.cookie = "inta_state=; expires=" + expires + "; domain=" + domain + "; path=/";
 }
 
 function signin(email) {
