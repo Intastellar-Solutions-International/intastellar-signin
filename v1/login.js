@@ -22,6 +22,16 @@ class IntastellarSolutionsSDKSuccess extends Error {
     }
 };
 
+function closeSignIn() {
+    if (window.innerWidth <= 768) {
+        document.querySelector('.intastellar-popup').style.bottom = '-100%';
+        document.querySelector('.intastellar-popup-shadow').style.visibility = 'hidden'
+    } else {
+        document.querySelector('.intastellar-popup').style.right = '-100%';
+        document.querySelector('.intastellar-popup-shadow').style.visibility = 'hidden'
+    }
+}
+
 function signin(email) {
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
@@ -236,7 +246,7 @@ const Intastellar = {
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
                             <p class="header-info">Sign into ${appName} with Intastellar</p>
-                            <button class="close-popup" onclick="document.querySelector('.intastellar-popup').style.bottom = '-100%'; document.querySelector('.intastellar-popup-shadow').style.visibility = 'hidden'">
+                            <button class="close-popup" onclick="closeSignIn()">
                                 <svg class="Bz112c Bz112c-r9oPif" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path><path fill="none" d="M0 0h24v24H0z"></path></svg>
                             </button>
                         </header>`;
