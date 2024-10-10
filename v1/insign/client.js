@@ -61,7 +61,7 @@ function closeSignIn() {
     expires.setFullYear(expires.getFullYear() + 2);
     domain = domain.split(":")[0];
 
-    document.cookie = "inta_state=1; expires=" + expires + "; domain=" + domain + "; path=/";
+    document.cookie = "inta_state=1; expires=" + expires.toUTCString() + "; domain=" + domain + "; path=/";
 }
 
 function signin(email) {
