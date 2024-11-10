@@ -341,7 +341,6 @@ const Intastellar = {
                         'Content-Type': 'application/json',
                     }
                 }).then(e => e.json()).then(e => {
-
                     const user = e.user;
                     const user2 = e.user2;
                     const loginbtn = document.querySelector(".IntastellarSignin");
@@ -350,17 +349,20 @@ const Intastellar = {
                     const intastellarLogo = document.querySelector(".intastellar-logo");
 
                     if (window.innerWidth > 768) {
-                        if (user) {
+                        if (user && intastellarLogo != null) {
                             intastellarLogo.classList.add("reverse");
                         }
                         if (type == null || type == undefined || type == "") {
-                            intastellarSignInInfo.innerHTML = "Sign in as " + user.name.first;
-                            intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
+                            console.log("Sign in with Intastellar");
+                            document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
+                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
                         } else if (type == "signup") {
                             intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
                             intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
                         }
-                        loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
+                        if (loginbtn != null) {
+                            loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
+                        }
                     } else {
 
                         if (user && user2.length == 0) {
