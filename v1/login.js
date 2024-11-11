@@ -325,7 +325,9 @@ const Intastellar = {
                 intastellarPopupButton.setAttribute("onclick", "signin()");
 
                 intastellarPopupContent.appendChild(intastellarPopupButton);
-                intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
+                if (type === "signup") {
+                    intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
+                }
                 intastellarPopup.appendChild(intastellarPopupContent);
                 document.body.appendChild(intastellarPopupShadow);
                 if (getCookie("inta_state") == "1" && theme.picker == "popup") {
