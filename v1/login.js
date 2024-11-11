@@ -301,7 +301,7 @@ const Intastellar = {
                 intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
-                            <p class="header-info">Sign into ${appName} with Intastellar</p>
+                            <p class="header-info">Sign in to ${appName} with Intastellar</p>
                             <button class="close-popup" onclick="closeSignIn()">
                                 <svg class="Bz112c Bz112c-r9oPif" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path><path fill="none" d="M0 0h24v24H0z"></path></svg>
                             </button>
@@ -309,7 +309,7 @@ const Intastellar = {
 
                 intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
                     <section>
-                        <p class="intastellarSignIn-title">Sign into '${appName}' with your Intastellar Account</p>
+                        <p class="intastellarSignIn-title">Sign in to '${appName}' with your Intastellar Account</p>
                         <p class="intastellarSignIn-info">
                             You no longer need to remember your passwords. Logging in is quick, easy and secure.
                         </p>
