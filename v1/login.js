@@ -375,7 +375,7 @@ const Intastellar = {
                         }
 
                         if (user2) {
-                            document.querySelector(".intastellar-popup-user").innerHTML = `<img src="${user2.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
+                            document.querySelector(".intastellar-popup-header").innerHTML += `<img src="${user2.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
                         }
 
                         if (user && user2) {
