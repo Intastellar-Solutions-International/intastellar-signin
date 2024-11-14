@@ -369,12 +369,27 @@ const Intastellar = {
                         }
 
                         if (user) {
-                            document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
+                            document.querySelector(".intastellar-popup-header").innerHTML = `
+                                <div class="intastellar-popup-user">
+                                    <img src="${user.image}" class="intastellar-popup-userProfile">
+                                    <div class="intastellar-popup-header-info">
+                                        <p class="intastellar-popup-userName">${user.name.first}</p>
+                                        <p class="intastellar-popup-header-email">${user.email}</p>
+                                    </div>
+                                </div>
+                            `;
                             document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
                         }
 
                         if (user2) {
-                            document.querySelector(".intastellar-popup-header").innerHTML += `<img src="${user2.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
+                            document.querySelector(".intastellar-popup-header").innerHTML += `
+                            <div class="intastellar-popup-user">
+                                <img src="${user2.image}" class="intastellar-popup-userProfile">
+                                <div class="intastellar-popup-header-info">
+                                    <p class="intastellar-popup-userName">${user2.name.first}</p>
+                                    <p class="intastellar-popup-header-email">${user2.email}</p>
+                                </div>
+                            </div>`;
                         }
 
                         if (user && user2) {
