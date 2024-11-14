@@ -363,6 +363,23 @@ const Intastellar = {
                         if (loginbtn != null) {
                             loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
                         }
+
+                        if (user && user2.length == 0) {
+                            document.querySelector(".intastellar-popup-button").setAttribute("onclick", "signin('" + user.email + "')");
+                        }
+
+                        if (user) {
+                            document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
+                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
+                        }
+
+                        if (user2) {
+                            document.querySelector(".intastellar-popup-header").innerHTML += `<img src="${user2.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
+                        }
+
+                        if (user && user2) {
+                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue by choosing an account";
+                        }
                     } else {
 
                         if (user && user2.length == 0) {
