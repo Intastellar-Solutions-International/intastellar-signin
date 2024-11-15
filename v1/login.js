@@ -373,15 +373,14 @@ const Intastellar = {
                         }
 
                         if (user) {
-                            intastellarPopupContent.innerHTML = `<div class='intastellar-popup-header'>
+                            intastellarPopupContent.innerHTML = `
                                 <div class="intastellar-popup-user">
                                     <img src="${user.image}" class="intastellar-popup-userProfile">
                                     <div class="intastellar-popup-header-info">
                                         <p class="intastellar-popup-userName">${user.name.first}</p>
                                         <p class="intastellar-popup-header-email">${user.email}</p>
                                     </div>
-                                </div>
-                            </div>`;
+                                </div>`;
                             intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
                         }
 
