@@ -307,7 +307,7 @@ const Intastellar = {
                             </button>
                         </header>`;
 
-                intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
+                intastellarPopupContent.innerHTML += `<div class='intastellar-popup-user'>
                     <section>
                         <p class="intastellarSignIn-title">Sign in to '${appName}' with your Intastellar Account</p>
                         <p class="intastellarSignIn-info">
@@ -322,12 +322,11 @@ const Intastellar = {
                 intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
                 intastellarPopupButton.setAttribute("onclick", "signin()");
 
-                intastellarPopupContent.appendChild(intastellarPopupButton);
+
                 if (type === "signup") {
                     intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
                 }
-                intastellarPopup.appendChild(intastellarPopupContent);
-                document.body.appendChild(intastellarPopupShadow);
+
                 if (getCookie("inta_state") == "1" && theme.picker == "popup") {
                     console.log("Hide popup");
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
@@ -349,13 +348,18 @@ const Intastellar = {
                     const intastellarLogo = document.querySelector(".intastellar-logo");
 
                     if (window.innerWidth > 768) {
+                        console.log("Desktop");
                         if (user && intastellarLogo != null) {
                             intastellarLogo.classList.add("reverse");
                         }
                         if (type == null || type == undefined || type == "") {
                             console.log("Sign in with Intastellar");
-                            document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
-                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
+
+                            intastellarPopupContent.innerHTML = `<div class='intastellar-popup-header intastellar-popup-user'>
+                            <img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>
+                            </div>`;
+                            intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
+
                         } else if (type == "signup") {
                             intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
                             intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
@@ -369,7 +373,7 @@ const Intastellar = {
                         }
 
                         if (user) {
-                            document.querySelector(".intastellar-popup-header").innerHTML = `
+                            intastellarPopupContent.innerHTML = `<div class='intastellar-popup-header'>
                                 <div class="intastellar-popup-user">
                                     <img src="${user.image}" class="intastellar-popup-userProfile">
                                     <div class="intastellar-popup-header-info">
@@ -377,12 +381,12 @@ const Intastellar = {
                                         <p class="intastellar-popup-header-email">${user.email}</p>
                                     </div>
                                 </div>
-                            `;
-                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
+                            </div>`;
+                            intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
                         }
 
                         if (user2) {
-                            document.querySelector(".intastellar-popup-header").innerHTML += `
+                            intastellarPopupContent.innerHTML += `
                             <div class="intastellar-popup-user">
                                 <img src="${user2.image}" class="intastellar-popup-userProfile">
                                 <div class="intastellar-popup-header-info">
@@ -393,16 +397,17 @@ const Intastellar = {
                         }
 
                         if (user && user2) {
-                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue by choosing an account";
+                            intastellarPopupButton.innerHTML = "Continue by choosing an account";
                         }
+                        console.log("User logged in");
                     } else {
 
                         if (user && user2.length == 0) {
-                            document.querySelector(".intastellar-popup-button").setAttribute("onclick", "signin('" + user.email + "')");
+                            intastellarPopupButton.setAttribute("onclick", "signin('" + user.email + "')");
                         }
 
                         if (user) {
-                            document.querySelector(".intastellar-popup-header").innerHTML = `
+                            intastellarPopupContent.innerHTML = `
                             <div class="intastellar-popup-user">
                                 <img src="${user.image}" class="intastellar-popup-userProfile">
                                 <div class="intastellar-popup-header-info">
@@ -410,50 +415,56 @@ const Intastellar = {
                                     <p class="intastellar-popup-header-email">${user.email}</p>
                                 </div>
                             </div>`;
-                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
+                            intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
                         }
 
                         if (user2) {
-                            document.querySelector(".intastellar-popup-header").innerHTML += `
+                            intastellarPopupContent.innerHTML += `
                             <div class="intastellar-popup-user">
                                 <img src="${user2.image}" class="intastellar-popup-userProfile">
                                 <div class="intastellar-popup-header-info">
-                                <p class="intastellar-popup-userName">${user2.name.first}</p>
-                                <p class="intastellar-popup-header-email">${user2.email}</p>
+                                    <p class="intastellar-popup-userName">${user2.name.first}</p>
+                                    <p class="intastellar-popup-header-email">${user2.email}</p>
+                                </div>
                             </div>`;
                         }
 
+                        console.log("Mobile");
+
                         if (user && user2) {
-                            document.querySelector(".intastellar-popup-button").innerHTML = "Continue by choosing an account";
+                            intastellarPopupButton.innerHTML = "Continue by choosing an account";
                         }
                     }
-
                 }).catch(e => {
                     new IntastellarSolutionsSDKError("User not logged in");
-                })
+                }).finally(() => {
+                    intastellarPopupContent.appendChild(intastellarPopupButton);
+                    intastellarPopup.appendChild(intastellarPopupContent);
+                    document.body.appendChild(intastellarPopupShadow);
 
-                if (IntastellarButtonContainer != null || IntastellarButtonContainer != undefined) {
-                    if (theme.picker != "popup") {
-                        IntastellarButtonContainer.appendChild(IntastellarSigninButton);
-                        IntastellarSigninButton.addEventListener("click", (e) => {
-                            e.preventDefault();
-                            if (window.innerWidth > 768) {
-                                signin();
-                            } else {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                                setTimeout(() => {
-                                    document.querySelector(".intastellar-popup").style.bottom = "0";
-                                }, 100);
-                            }
-                        })
-                    } else {
-                        if (getCookie("inta_acc") == null) {
-                            if (getCookie("inta_state") != "1" && theme.picker == "popup") {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                    if (IntastellarButtonContainer != null || IntastellarButtonContainer != undefined) {
+                        if (theme.picker != "popup") {
+                            IntastellarButtonContainer.appendChild(IntastellarSigninButton);
+                            IntastellarSigninButton.addEventListener("click", (e) => {
+                                e.preventDefault();
+                                if (window.innerWidth > 768) {
+                                    signin();
+                                } else {
+                                    document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                                    setTimeout(() => {
+                                        document.querySelector(".intastellar-popup").style.bottom = "0";
+                                    }, 100);
+                                }
+                            })
+                        } else {
+                            if (getCookie("inta_acc") == null) {
+                                if (getCookie("inta_state") != "1" && theme.picker == "popup") {
+                                    document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                                }
                             }
                         }
                     }
-                }
+                })
             },
             logout() {
                 // Get root domain or the ip address if domain is not available
