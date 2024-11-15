@@ -338,6 +338,8 @@ const Intastellar = {
 
                     intastellarPopupContent.innerHTML = "";
 
+                    console.log(user.length);
+
                     if (user.length == 0) {
 
 
@@ -365,7 +367,7 @@ const Intastellar = {
                         })
 
                         if (user.length == 1) {
-                            intastellarPopupButton.innerHTML = "Continue as " + e.name.first;
+                            intastellarPopupButton.innerHTML = "Continue as " + user[0].name.first;
                             intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "')");
                         } else {
                             intastellarPopupButton.innerHTML = "Continue by choosing an account";
