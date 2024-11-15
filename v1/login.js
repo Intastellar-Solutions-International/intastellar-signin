@@ -340,99 +340,41 @@ const Intastellar = {
                         'Content-Type': 'application/json',
                     }
                 }).then(e => e.json()).then(e => {
-                    const user = e.user;
-                    const user2 = e.user2;
+                    const user = e;
                     const loginbtn = document.querySelector(".IntastellarSignin");
                     const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                     const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
                     const intastellarLogo = document.querySelector(".intastellar-logo");
 
-                    if (window.innerWidth > 768) {
-                        console.log("Desktop");
-                        if (user && intastellarLogo != null) {
-                            intastellarLogo.classList.add("reverse");
-                        }
-                        if (type == null || type == undefined || type == "") {
-                            console.log("Sign in with Intastellar");
+                    intastellarPopupContent.innerHTML = "";
+                    user.map(e => {
+                        intastellarPopupContent.innerHTML += `
+                                    <div class='intastellar-popup-header intastellar-popup-user'>
+                                        <img src="${e.image}" class="intastellar-popup-userProfile">
+                                        <div class="intastellar-popup-header-info">
+                                            <p class="intastellar-popup-userName">${e.name.first}</p>
+                                            <p class="intastellar-popup-header-email">${e.email}</p>
+                                        </div>
+                                    </div>`;
 
-                            intastellarPopupContent.innerHTML = `<div class='intastellar-popup-header intastellar-popup-user'>
-                            <img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>
-                            </div>`;
-                            intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
+                    })
+                    if (user && intastellarLogo != null) {
+                        intastellarLogo.classList.add("reverse");
+                    }
+                    if (type == null || type == undefined || type == "") {
+                        console.log("Sign in with Intastellar");
 
-                        } else if (type == "signup") {
-                            intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
-                            intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
-                        }
-                        if (loginbtn != null) {
-                            loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
-                        }
+                    } else if (type == "signup") {
+                        intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
+                        intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
+                    }
+                    if (loginbtn != null) {
+                        loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
+                    }
 
-                        if (user && user2.length == 0) {
-                            document.querySelector(".intastellar-popup-button").setAttribute("onclick", "signin('" + user.email + "')");
-                        }
-
-                        if (user) {
-                            intastellarPopupContent.innerHTML = `
-                                <div class="intastellar-popup-user">
-                                    <img src="${user.image}" class="intastellar-popup-userProfile">
-                                    <div class="intastellar-popup-header-info">
-                                        <p class="intastellar-popup-userName">${user.name.first}</p>
-                                        <p class="intastellar-popup-header-email">${user.email}</p>
-                                    </div>
-                                </div>`;
-                            intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
-                        }
-
-                        if (user2) {
-                            intastellarPopupContent.innerHTML += `
-                            <div class="intastellar-popup-user">
-                                <img src="${user2.image}" class="intastellar-popup-userProfile">
-                                <div class="intastellar-popup-header-info">
-                                    <p class="intastellar-popup-userName">${user2.name.first}</p>
-                                    <p class="intastellar-popup-header-email">${user2.email}</p>
-                                </div>
-                            </div>`;
-                        }
-
-                        if (user && user2) {
-                            intastellarPopupButton.innerHTML = "Continue by choosing an account";
-                        }
-                        console.log("User logged in");
-                    } else {
-
-                        if (user && user2.length == 0) {
-                            intastellarPopupButton.setAttribute("onclick", "signin('" + user.email + "')");
-                        }
-
-                        if (user) {
-                            intastellarPopupContent.innerHTML = `
-                            <div class="intastellar-popup-user">
-                                <img src="${user.image}" class="intastellar-popup-userProfile">
-                                <div class="intastellar-popup-header-info">
-                                    <p class="intastellar-popup-userName">${user.name.first}</p>
-                                    <p class="intastellar-popup-header-email">${user.email}</p>
-                                </div>
-                            </div>`;
-                            intastellarPopupButton.innerHTML = "Continue as " + user.name.first;
-                        }
-
-                        if (user2) {
-                            intastellarPopupContent.innerHTML += `
-                            <div class="intastellar-popup-user">
-                                <img src="${user2.image}" class="intastellar-popup-userProfile">
-                                <div class="intastellar-popup-header-info">
-                                    <p class="intastellar-popup-userName">${user2.name.first}</p>
-                                    <p class="intastellar-popup-header-email">${user2.email}</p>
-                                </div>
-                            </div>`;
-                        }
-
-                        console.log("Mobile");
-
-                        if (user && user2) {
-                            intastellarPopupButton.innerHTML = "Continue by choosing an account";
-                        }
+                    intastellarPopupButton.innerHTML = "Continue as " + e.name.first;
+                    if (user.length == 1) {
+                        intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "')");
                     }
                 }).catch(e => {
                     new IntastellarSolutionsSDKError("User not logged in");
