@@ -26,13 +26,11 @@
     </div>
     <script>
 
-        Intastellar.accounts.id.renderButton("buttonDiv",
-            {
-                'theme': 'dark',
-                'scopes': ['phone', 'birthday', "design"],
-                'picker': 'button',
-            }
-        )
+        Intastellar.accounts.id.renderButton("buttonDiv", {
+            'theme': 'dark',
+            'scopes': ['phone', 'birthday', "design"],
+            'picker': 'popup',
+        })
 
         function logUserIn(token) {
             document.querySelector("#profileImage").src = "";

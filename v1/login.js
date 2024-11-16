@@ -231,7 +231,11 @@ function loginViaToken() {
 const Intastellar = {
     accounts: {
         id: {
-            renderButton(element, theme = {}) {
+            renderButton(element, theme = {
+                theme: "light",
+                scopes: "profile",
+                picker: "popup",
+            }) {
                 const styleSheet = document.createElement("link");
                 styleSheet.rel = "stylesheet";
                 styleSheet.href = "https://account.api.intastellarsolutions.com/v1/insign/style.css";
