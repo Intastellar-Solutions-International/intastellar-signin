@@ -306,7 +306,9 @@ const Intastellar = {
                 const intastellarPopupButton = document.createElement("button");
                 intastellarPopupButton.innerHTML = "Continue with Intastellar";
                 intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
-                intastellarPopupButton.setAttribute("onclick", "signin(null, appName, key)");
+                intastellarPopupButton.addEventListener("click", function () {
+                    signin(null, appName, key);
+                });
 
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
