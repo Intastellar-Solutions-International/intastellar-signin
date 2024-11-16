@@ -381,7 +381,7 @@ const Intastellar = {
                             }
 
                             intastellarPopupButton.innerHTML = "Continue as " + user[0].name.first;
-                            intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + ", " + appName + "')");
+                            intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "', '" + appName + "')");
                         } else {
                             intastellarPopupButton.innerHTML = "Continue by choosing an account";
                             intastellarPopupButton.setAttribute("onclick", "signin(null, appName)");
