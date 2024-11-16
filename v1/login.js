@@ -64,11 +64,11 @@ function closeSignIn() {
     document.cookie = "inta_state=1; expires=" + expires.toUTCString() + "; domain=" + domain + "; path=/";
 }
 
-function signin(email, nameOfApp) {
+function signin(email, nameOfApp, apiKey) {
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name") || nameOfApp;
-    const key = document.querySelector("[data-client_id]")?.getAttribute("data-client_id");
+    const key = document.querySelector("[data-client_id]")?.getAttribute("data-client_id") || apiKey;
     const scope = document.querySelector("[data-scope]")?.getAttribute("data-scope") || "profile";
 
     // Get root domain or the ip address if domain is not available
@@ -278,6 +278,7 @@ const Intastellar = {
                 IntastellarSigniniFrame.setAttribute("id", "intastellar-signin-iframe");
                 IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button.php?v=" + Math.random());
                 let appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
+                let key = document.querySelector("[data-client_id]")?.getAttribute("data-client_id");
                 if (theme.picker == "popup" && theme.appName != null) {
                     appName = theme.appName || document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
                 } else {
@@ -305,7 +306,7 @@ const Intastellar = {
                 const intastellarPopupButton = document.createElement("button");
                 intastellarPopupButton.innerHTML = "Continue with Intastellar";
                 intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
-                intastellarPopupButton.setAttribute("onclick", "signin(null, appName)");
+                intastellarPopupButton.setAttribute("onclick", "signin(null, appName, key)");
 
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
@@ -383,11 +384,11 @@ const Intastellar = {
                             intastellarPopupButton.innerHTML = "Continue as " + user[0].name.first;
                             /* intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "', '" + appName + "')"); */
                             intastellarPopupButton.addEventListener("click", () => {
-                                signin(user[0].email, appName);
+                                signin(user[0].email, appName, key);
                             });
                         } else {
                             intastellarPopupButton.innerHTML = "Continue by choosing an account";
-                            intastellarPopupButton.setAttribute("onclick", "signin(null, appName)");
+                            intastellarPopupButton.setAttribute("onclick", "signin(null, appName, key)");
                         }
                     }
                     if (user && intastellarLogo != null) {
@@ -413,7 +414,7 @@ const Intastellar = {
                             IntastellarSigninButton.addEventListener("click", (e) => {
                                 e.preventDefault();
                                 if (window.innerWidth > 768) {
-                                    signin(null, appName);
+                                    signin(null, appName, key);
                                 } else {
                                     document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
                                     setTimeout(() => {
