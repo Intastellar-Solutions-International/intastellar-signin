@@ -390,7 +390,9 @@ const Intastellar = {
                             });
                         } else {
                             intastellarPopupButton.innerHTML = "Continue by choosing an account";
-                            intastellarPopupButton.setAttribute("onclick", "signin(null, appName, key)");
+                            intastellarPopupButton.addEventListener("click", () => {
+                                signin(null, appName, key);
+                            });
                         }
                     }
                     if (user && intastellarLogo != null) {
