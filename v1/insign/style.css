@@ -4,6 +4,7 @@
     border: 1px solid #c4c4cc;
     border-radius: 5px;
     display: flex;
+    gap: 5px;
     align-items: center;
     justify-content: space-between;
     background-color: #fff;
