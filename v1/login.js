@@ -269,8 +269,6 @@ const Intastellar = {
                 const IntastellarLogo = document.createElement("img");
                 IntastellarLogo.setAttribute("src", intastellarLogoSrc)
                 IntastellarLogo.setAttribute("class", "intastellar-logo");
-                IntastellarSigninButton.appendChild(IntastellarLogo);
-                IntastellarSigninButton.appendChild(IntastellarText);
 
                 const IntastellarSigniniFrame = document.createElement("iframe");
                 IntastellarSigniniFrame.setAttribute("id", "intastellar-signin-iframe");
@@ -336,9 +334,10 @@ const Intastellar = {
                     const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
                     const intastellarLogo = document.querySelector(".intastellar-logo");
 
-                    intastellarPopupContent.innerHTML = "";
+                    IntastellarSigninButton.appendChild(IntastellarLogo);
+                    IntastellarSigninButton.appendChild(IntastellarText);
 
-                    console.log(user.length);
+                    intastellarPopupContent.innerHTML = "";
 
                     if (user.length == 0) {
 
@@ -367,6 +366,16 @@ const Intastellar = {
                         })
 
                         if (user.length == 1) {
+                            const IntastellarUserProfile = document.createElement("img");
+                            IntastellarUserProfile.setAttribute("class", "intastellar-userProfile");
+                            IntastellarUserProfile.setAttribute("src", user[0].image);
+                            IntastellarSigninButton.appendChild(IntastellarUserProfile);
+                            IntastellarSigninButton.appendChild(IntastellarText);
+                            IntastellarSigninButton.appendChild(IntastellarLogo);
+                            if (theme.picker == "button") {
+                                IntastellarText.innerHTML = "Continue as " + user[0].name.first;
+                            }
+
                             intastellarPopupButton.innerHTML = "Continue as " + user[0].name.first;
                             intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "')");
                         } else {
