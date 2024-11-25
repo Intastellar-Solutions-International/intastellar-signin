@@ -229,7 +229,6 @@
     background-color: rgb(192, 159, 83);
     color: #efefef;
     cursor: pointer;
-    transition: all .5s ease-in-out;
 }
 
 .intastellar-popup-button:hover {
