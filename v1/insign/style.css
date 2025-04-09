@@ -4,6 +4,7 @@
     border: 1px solid #c4c4cc;
     border-radius: 5px;
     display: flex;
+    gap: 5px;
     align-items: center;
     justify-content: space-between;
     background-color: #fff;
@@ -45,8 +46,28 @@
     order: 1;
 }
 
+.intastellar-popup-shadow.top-left {
+    visibility: visible;
+}
+
+.intastellar-popup-shadow.top-left .intastellar-popup {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    left: unset;
+    bottom: unset;
+    max-width: 460px;
+
+    border-radius: 10px;
+}
+
 .intastellarSignIn-info {
     font-size: 15px;
+    color: #6e6e6e;
+}
+
+.dark .intastellarSignIn-info {
+    color: #a5a5a5;
 }
 
 .intastellar-logo {
@@ -63,13 +84,58 @@
     display: block;
 }
 
-.intastellar-popup {
+.intastellar-popup-shadow {
     width: 100%;
-    height: auto;
-    display: none;
+    display: block;
     position: fixed;
     bottom: 0;
     left: 0;
+    visibility: hidden;
+    z-index: 2047483648 !important;
+}
+
+.close-popup {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    width: 33px;
+    height: 33px;
+    background-color: transparent;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .5s ease-in-out;
+}
+
+.Bz112c-r9oPif {
+    height: 24px;
+    width: 24px;
+}
+
+.close-popup:hover {
+    background-color: #e6e6e6;
+}
+
+.dark .close-popup:hover {
+    background-color: #6e6e6e;
+}
+
+.dark .Bz112c-r9oPif {
+    fill: #c8c8c8;
+}
+
+.intastellar-popup {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    overflow: hidden;
+    transition: all .5s ease-in-out;
     background-color: #fff;
     z-index: 9999;
     border-top-left-radius: 10px;
@@ -83,13 +149,13 @@
 }
 
 .intastellar-popup-content {
-    padding: 10px;
+    padding: 17px;
 }
 
 .mobile-header {
     width: 100%;
     border-bottom: 1px solid #c7c7c7;
-    padding: 5px 10px;
+    padding: 10px 15px;
     top: 0;
     display: flex;
     align-items: center;
@@ -107,14 +173,15 @@
     color: #7c7c7c;
 }
 
-.intastellar-popup-header img {
+.intastellar-popup-header img,
+.intastellar-popup-user img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
 }
 
-.intastellar-popup-header {
+.intastellar-popup-user {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -125,29 +192,70 @@
     color: #7c7c7c;
 }
 
+.intastellarSignIn-title {
+    font-size: 20px;
+    font-weight: 300;
+    color: #272727;
+}
+
+.dark .intastellarSignIn-title {
+    color: #e6e6e6;
+}
+
 .intastellar-popup-header-info {
     margin-left: 10px;
     color: #272727;
 }
 
+.dark .intastellar-popup-header-info {
+    color: #fff;
+}
+
+.dark .intastellar-popup-header-email,
+.dark .header-info {
+    color: #a5a5a5;
+}
+
 .intastellar-popup-header-info p {
     margin: 0;
+    line-height: 16px;
 }
 
 .intastellar-popup-button {
-    padding: 8px 14px 8px 14px;
-    font-size: 14px;
+    padding: 14px;
+    font-size: 16px;
     width: 100%;
     border: none;
     border-radius: 5px;
     background-color: rgb(192, 159, 83);
     color: #efefef;
     cursor: pointer;
-    transition: all .5s ease-in-out;
+}
+
+.intastellar-popup-button:hover {
+    background-color: rgb(154, 133, 80);
 }
 
 .intastellar-popup-footer {
     font-size: 12px;
     padding: 10px;
     color: #7c7c7c;
+}
+
+@media screen and (max-width: 768px) {
+
+    .intastellar-popup-shadow.top-left {
+        width: 100%;
+    }
+
+    .intastellar-popup-shadow.top-left .intastellar-popup {
+        top: unset;
+        bottom: 0px;
+        right: 0px;
+        width: 100%;
+
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+    }
+
 }

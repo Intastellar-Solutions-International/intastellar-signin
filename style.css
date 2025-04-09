@@ -32,3 +32,11 @@ body {
 .profile h2 {
     font-size: 20px;
 }
+
+@media screen and (max-width: 768px) {
+    .content {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+}
