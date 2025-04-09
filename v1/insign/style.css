@@ -9,6 +9,7 @@
     background-color: #fff;
     color: #272727;
     cursor: pointer;
+    margin: auto;
     transition: all .5s ease-in-out;
 }
 
