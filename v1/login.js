@@ -431,6 +431,19 @@ const Intastellar = {
                                 if (getCookie("inta_state") != "1" && theme.picker == "popup") {
                                     document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
                                 }
+                            } else {
+                                IntastellarButtonContainer.appendChild(IntastellarSigninButton);
+                                IntastellarSigninButton.addEventListener("click", (e) => {
+                                    e.preventDefault();
+                                    if (window.innerWidth > 768) {
+                                        signin(null, appName, key);
+                                    } else {
+                                        document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
+                                        setTimeout(() => {
+                                            document.querySelector(".intastellar-popup").style.bottom = "0";
+                                        }, 100);
+                                    }
+                                })
                             }
                         }
                     }
