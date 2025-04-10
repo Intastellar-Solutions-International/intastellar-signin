@@ -64,6 +64,19 @@ function closeSignIn() {
     document.cookie = "inta_state=1; expires=" + expires.toUTCString() + "; domain=" + domain + "; path=/";
 }
 
+function formatArray(arr) {
+    if (arr.length === 0) {
+        return "";
+    }
+    if (arr.length === 1) {
+        return arr[0];
+    }
+    if (arr.length === 2) {
+        return arr.join(" & ");
+    }
+    return ", " + arr.slice(0, -1).join(", ") + " & " + arr[arr.length - 1];
+}
+
 function signin(email, nameOfApp, apiKey) {
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
@@ -319,7 +332,8 @@ const Intastellar = {
                         </header>`;
 
                 if (type === "signup") {
-                    intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
+                    intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email, profile picture" +
+                        formatArray(theme.scopes) + " with " + appName + ".</p>";;
                 }
 
                 if (getCookie("inta_state") == "1" && theme.picker == "popup") {
@@ -411,6 +425,8 @@ const Intastellar = {
                     new IntastellarSolutionsSDKError("User not logged in");
                 }).finally(() => {
                     intastellarPopupContent.appendChild(intastellarPopupButton);
+                    intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To sign in, Intastellar will share your name, email, profile picture" +
+                        formatArray(theme.scopes) + " with " + appName + ".</p>";
                     intastellarPopup.appendChild(intastellarPopupContent);
                     document.body.appendChild(intastellarPopupShadow);
 
