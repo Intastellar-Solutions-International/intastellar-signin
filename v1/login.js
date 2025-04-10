@@ -337,7 +337,6 @@ const Intastellar = {
                 }
 
                 if (getCookie("inta_state") == "1" && theme.picker == "popup") {
-                    console.log("Hide popup");
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                 }
 
@@ -385,8 +384,6 @@ const Intastellar = {
                         </div>`;
 
                         })
-
-                        console.log(user.length);
 
                         if (user.length == 1) {
                             const IntastellarUserProfile = document.createElement("img");
