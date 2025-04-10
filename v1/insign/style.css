@@ -240,6 +240,7 @@
     font-size: 12px;
     padding: 10px;
     color: #7c7c7c;
+    line-height: 14px;
 }
 
 @media screen and (max-width: 768px) {
