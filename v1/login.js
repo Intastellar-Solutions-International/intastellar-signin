@@ -372,6 +372,8 @@ const Intastellar = {
 
                         })
 
+                        console.log(user.length);
+
                         if (user.length == 1) {
                             const IntastellarUserProfile = document.createElement("img");
                             IntastellarUserProfile.setAttribute("class", "intastellar-userProfile");
@@ -379,7 +381,7 @@ const Intastellar = {
                             IntastellarSigninButton.appendChild(IntastellarUserProfile);
                             IntastellarSigninButton.appendChild(IntastellarText);
                             IntastellarSigninButton.appendChild(IntastellarLogo);
-                            if (theme.picker == "button") {
+                            if (theme.picker == "button" || getCookie("inta_acc") != null) {
                                 IntastellarText.innerHTML = "Continue as " + user[0].name.first;
                             }
 
