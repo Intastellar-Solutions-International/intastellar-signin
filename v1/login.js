@@ -164,7 +164,7 @@ function signin(email, nameOfApp, apiKey) {
                     e.account.user.birthday = birthday;
                     delete e.account.user[0];
                     const t = e.account;
-                    const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
+                    const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.user.name.first);
                     console.log(success.getCustomSuccessMessage());
                     document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + "; path=/";
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
@@ -193,9 +193,10 @@ function signin(email, nameOfApp, apiKey) {
                     const { phone, birthday } = e.account.user[0];
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
-                    delete e.account.user[0];
-                    const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
+                    const t = e.account.user;
+                    const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + t.name.first);
                     console.log(success.getCustomSuccessMessage());
+                    delete e.account.user[0];
 
                     document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + "; path=/";
 
@@ -229,7 +230,7 @@ function loginViaToken() {
             body: token
         }).then(e => e.json()).then(e => {
             if (e.statusCode == 200) {
-                const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.name);
+                const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user[0].name.first + " " + e.account.user[0].name.last);
                 console.log(success.getCustomSuccessMessage());
                 return e.account;
             } else {
