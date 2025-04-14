@@ -319,9 +319,9 @@ const Intastellar = {
                 const intastellarPopupButton = document.createElement("button");
                 intastellarPopupButton.innerHTML = "Continue with Intastellar";
                 intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
-                intastellarPopupButton.addEventListener("click", function () {
+                /* intastellarPopupButton.addEventListener("click", function () {
                     signin(null, appName, key);
-                });
+                }); */
 
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
@@ -397,10 +397,12 @@ const Intastellar = {
                             }
 
                             intastellarPopupButton.innerHTML = "Continue as " + user[0].name.first;
-                            /* intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "', '" + appName + "')"); */
-                            intastellarPopupButton.addEventListener("click", () => {
+
+                            intastellarPopupButton.setAttribute("onclick", "signin('" + user[0].email + "', '" + appName + "')");
+                            /* intastellarPopupButton.addEventListener("click", (e) => {
+                                console.log(e);
                                 signin(user[0].email, appName, key);
-                            });
+                            }); */
                         } else {
                             intastellarPopupButton.innerHTML = "Continue by choosing an account";
                             intastellarPopupButton.addEventListener("click", () => {
