@@ -20,15 +20,15 @@
         <img id="profileImage" src="https://scontent-uc-d2c-7.intastellar.com/a/s/ul/p/avtr46-img/profile_standard.jpg"
             alt="Profile Image">
         <div id="user">
-            <p>This is you Intastellar Account</p>
+            <p>This is your Intastellar Account</p>
             <div id="user-info"></div>
         </div>
     </div>
     <script>
 
         Intastellar.accounts.id.renderButton("buttonDiv", {
-            'theme': 'dark',
-            'scopes': ['phone', 'birthday', "design"],
+            'theme': 'light',
+            'scopes': ['phone'],
             'picker': 'popup',
         })
 
@@ -40,7 +40,7 @@
             document.querySelector("#user-info").innerHTML += "<h1>Welcome " + token.user.name.firstName + "</h1>";
             document.querySelector("#user-info").innerHTML += "<p>Your phone: " + token.user?.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p>Your email: " + token.user.email + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p>Your birthday: " + token.user?.birthday + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>Your birthday: " + token.user?.birthday ?? null + "</p>";
         }
 
         function signout() {
@@ -53,7 +53,7 @@
             document.querySelector("#user-info").innerHTML += "<h1>Welcome " + JSON.parse(localStorage.getItem("user")).user.name.firstName + "</h1>";
             document.querySelector("#user-info").innerHTML += "<p>Your phone: " + JSON.parse(localStorage.getItem("user")).user?.phone + "</p>";
             document.querySelector("#user-info").innerHTML += "<p>Your email: " + JSON.parse(localStorage.getItem("user")).user.email + "</p>";
-            document.querySelector("#user-info").innerHTML += "<p>Your birthday: " + JSON.parse(localStorage.getItem("user")).user?.birthday + "</p>";
+            document.querySelector("#user-info").innerHTML += "<p>Your birthday: " + JSON.parse(localStorage.getItem("user")).user?.birthday ?? null + "</p>";
             document.querySelector("#user-info").innerHTML += "<button onClick='signout()'>Logout</button>";
         }
     </script>
