@@ -1,0 +1,52 @@
+{
+  "name": "@intastellar/signin-sdk-react",
+  "version": "1.0.0",
+  "description": "Official Intastellar authentication SDK for React applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest",
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint:fix": "eslint src/**/*.{ts,tsx} --fix"
+  },
+  "keywords": [
+    "intastellar",
+    "authentication",
+    "oauth",
+    "react",
+    "signin",
+    "login"
+  ],
+  "author": "Intastellar Solutions International",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Intastellar-Solutions-International/intastellar-signin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Intastellar-Solutions-International/intastellar-signin/issues"
+  },
+  "homepage": "https://www.intastellaraccounts.com",
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.44.0",
+    "eslint-plugin-react": "^7.32.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^29.6.0",
+    "typescript": "^5.1.0"
+  }
+}
