@@ -125,7 +125,7 @@ function MyComponent() {
 ```jsx
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { useIntastellarRN } from "@intastellar/signin-sdk";
+import { useIntastellarRN } from "@intastellar-solutions-international/signin-sdk";
 
 function MyComponent() {
   const { users, isLoading, signin, logout, isSignedIn, error } =

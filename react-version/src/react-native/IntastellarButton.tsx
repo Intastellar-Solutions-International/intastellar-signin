@@ -1,5 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, Text, Image, View, StyleSheet, ActivityIndicator } from 'react-native';
+import { 
+  TouchableOpacity, 
+  Text, 
+  View, 
+  StyleSheet, 
+  ActivityIndicator,
+  Image as ReactNativeImage
+} from 'react-native';
 import { useIntastellarRN } from './useIntastellarRN';
 import { IntastellarConfig, IntastellarTheme } from '../types';
 
@@ -48,14 +55,16 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
       ) : (
         <View style={styles.content}>
           {users.length === 1 && (
-            <Image
+            <ReactNativeImage
               source={{ uri: users[0].image }}
               style={styles.profileImage}
+              resizeMode="cover"
             />
           )}
-          <Image
-            source={{ uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg' }}
+          <ReactNativeImage
+            source={{ uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.png' }}
             style={styles.logo}
+            resizeMode="contain"
           />
           <Text style={[
             styles.text,
@@ -92,16 +101,28 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   profileImage: {
     width: 20,
     height: 20,
     borderRadius: 10,
+    marginRight: 8,
   },
   logo: {
     width: 18,
     height: 18,
+    marginRight: 8,
+  },
+  logoContainer: {
+    width: 18,
+    height: 18,
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    fontSize: 12,
+    color: '#4285f4',
   },
   text: {
     fontSize: 14,

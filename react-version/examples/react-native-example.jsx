@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import { IntastellarButtonRN } from '@intastellar/signin-sdk';
+import { IntastellarButton } from '@intastellar-solutions-international/signin-sdk/react-native';
 
 export default function App() {
   const handleLogin = (account) => {
@@ -20,7 +20,7 @@ export default function App() {
         Sign in with your Intastellar account:
       </Text>
       
-      <IntastellarButtonRN
+      <IntastellarButton
         appName="Demo App"
         clientId="your-client-id"
         loginCallback={handleLogin}

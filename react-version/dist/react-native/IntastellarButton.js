@@ -38,7 +38,7 @@ var IntastellarButton = function (_a) {
             styles.button,
             isDark ? styles.darkButton : styles.lightButton,
             style,
-        ], onPress: handlePress, disabled: isLoading, children: isLoading ? ((0, jsx_runtime_1.jsx)(react_native_1.ActivityIndicator, { color: isDark ? '#fff' : '#3c4043' })) : ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: styles.content, children: [users.length === 1 && ((0, jsx_runtime_1.jsx)(react_native_1.Image, { source: { uri: users[0].image }, style: styles.profileImage })), (0, jsx_runtime_1.jsx)(react_native_1.Image, { source: { uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg' }, style: styles.logo }), (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [
+        ], onPress: handlePress, disabled: isLoading, children: isLoading ? ((0, jsx_runtime_1.jsx)(react_native_1.ActivityIndicator, { color: isDark ? '#fff' : '#3c4043' })) : ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: styles.content, children: [users.length === 1 && ((0, jsx_runtime_1.jsx)(react_native_1.Image, { source: { uri: users[0].image }, style: styles.profileImage, resizeMode: "cover" })), (0, jsx_runtime_1.jsx)(react_native_1.Image, { source: { uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.png' }, style: styles.logo, resizeMode: "contain" }), (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [
                         styles.text,
                         isDark ? styles.darkText : styles.lightText,
                         textStyle,
@@ -67,16 +67,28 @@ var styles = react_native_1.StyleSheet.create({
     content: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
     },
     profileImage: {
         width: 20,
         height: 20,
         borderRadius: 10,
+        marginRight: 8,
     },
     logo: {
         width: 18,
         height: 18,
+        marginRight: 8,
+    },
+    logoContainer: {
+        width: 18,
+        height: 18,
+        marginRight: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    logoText: {
+        fontSize: 12,
+        color: '#4285f4',
     },
     text: {
         fontSize: 14,

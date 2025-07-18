@@ -1,6 +1,6 @@
 {
   "name": "@intastellar-solutions-international/signin-sdk",
-  "version": "1.0.0",
+  "version": "1.0.21",
   "description": "Official Intastellar authentication SDK for React and React Native applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,12 +30,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Intastellar-Solutions-International/intastellar-signin.git"
+    "url": "git+https://github.com/Intastellar-Solutions-International/intastellar-signin.git"
   },
   "bugs": {
     "url": "https://github.com/Intastellar-Solutions-International/intastellar-signin/issues"
   },
-  "homepage": "https://github.com/Intastellar-Solutions-International/intastellar-signin#readme",
+  "homepage": "https://www.intastellaraccounts.com",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-native": ">=0.60.0"
