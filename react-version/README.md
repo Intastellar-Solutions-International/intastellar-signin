@@ -270,7 +270,7 @@ interface IntastellarAccount {
 
 ### Support
 
-- Documentation: [https://docs.intastellar.com](https://docs.intastellar.com)
+- Documentation: [https://developers.intastellarsolutions.com/identity/sign-in/web/docs](https://developers.intastellarsolutions.com/identity/sign-in/web/docs)
 - Issues: [GitHub Issues](https://github.com/Intastellar-Solutions-International/intastellar-signin/issues)
 - Email: support@intastellar.com
 

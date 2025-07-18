@@ -6,6 +6,71 @@
 2. **NPM CLI**: Make sure you have npm installed
 3. **Login**: Run `npm login` to authenticate
 
+## Private Package Setup Options
+
+### Option 1: NPM Private Packages (Paid - $7/month)
+
+- ✅ Easy to set up and use
+- ✅ Integrates seamlessly with public NPM
+- ✅ Professional and reliable
+- ❌ Requires paid subscription
+
+### Option 2: GitHub Packages (Free for private repos)
+
+- ✅ Free for private repositories
+- ✅ Integrates with GitHub
+- ✅ Good for GitHub-based workflows
+- ❌ Requires GitHub authentication setup
+- ❌ More complex configuration
+
+### Option 3: Local/Self-hosted (Free but complex)
+
+- ✅ Completely free
+- ✅ Full control
+- ❌ Requires server setup and maintenance
+- ❌ More complex to manage
+
+## Setting Up GitHub Packages (Recommended for Private Use)
+
+### 1. Create GitHub Personal Access Token
+
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Select scopes: `write:packages`, `read:packages`, `delete:packages`
+4. Copy the token (save it securely!)
+
+### 2. Configure NPM for GitHub Packages
+
+```bash
+# Create or edit ~/.npmrc file
+echo "@intastellar:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+echo "//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN" >> ~/.npmrc
+```
+
+### 3. Update package.json for GitHub Packages
+
+```json
+{
+  "name": "@intastellar/signin-sdk",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
+```
+
+### 4. Publish to GitHub Packages
+
+```bash
+npm publish
+```
+
+### 5. Install in Your Projects
+
+```bash
+# In your private projects, install from GitHub Packages
+npm install @intastellar/signin-sdk
+```
+
 ## Step-by-Step Publishing Process
 
 ### 1. Prepare the Package
@@ -52,12 +117,44 @@ npm pack --dry-run
 
 ### 4. Publish to NPM
 
+#### Option A: Public Package (Free)
+
 ```bash
 # First time publishing (public package)
 npm publish --access public
 
 # For subsequent updates
 npm publish
+```
+
+#### Option B: Private Package on NPM (Paid)
+
+```bash
+# First time publishing (private package) - requires NPM Pro subscription
+npm publish --access restricted
+
+# For subsequent updates
+npm publish
+```
+
+#### Option C: Private Package on GitHub Packages (Free for private repos)
+
+```bash
+# Configure GitHub Packages registry for @intastellar scope
+npm config set @intastellar:registry https://npm.pkg.github.com/
+
+# Login to GitHub Packages (use GitHub Personal Access Token)
+npm login --registry=https://npm.pkg.github.com/
+
+# Publish to GitHub Packages
+npm publish
+```
+
+#### Option D: Local/Self-hosted Registry
+
+```bash
+# For local development or self-hosted registries
+npm publish --registry http://your-private-registry.com
 ```
 
 ### 5. Verify Publication
@@ -241,6 +338,35 @@ function MyComponent() {
 1. **Permission denied**: Make sure you're logged in with `npm whoami`
 2. **Package name taken**: Use a scoped name like `@your-org/signin-sdk`
 3. **Version already exists**: Increment version with `npm version patch`
+4. **401 Unauthorized (GitHub Packages)**: Check your GitHub token permissions
+5. **Registry mismatch**: Ensure you're publishing to the correct registry
+
+### GitHub Packages Specific Issues
+
+1. **"unauthenticated: User cannot be authenticated"**:
+
+   - Check your GitHub Personal Access Token
+   - Verify token has `write:packages` permission
+   - Ensure token is not expired
+
+2. **"Package not found" when installing**:
+
+   - Verify your `.npmrc` file has the correct registry
+   - Check that the package name matches your GitHub organization
+
+3. **"403 Forbidden"**:
+   - Ensure you have write access to the repository
+   - Check that the package name matches the repository owner
+
+### Private Package Installation in Projects
+
+For private packages, your team members need to configure their npm as well:
+
+```bash
+# Each developer needs this in their ~/.npmrc
+echo "@intastellar:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+echo "//npm.pkg.github.com/:_authToken=THEIR_GITHUB_TOKEN" >> ~/.npmrc
+```
 
 ### Support
 
