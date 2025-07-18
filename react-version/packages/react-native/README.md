@@ -1,19 +1,39 @@
-# @intastellar-solutions-international/signin-sdk-react-native
+# @intastellar/signin-sdk-react-native
 
 Official Intastellar authentication SDK for React Native applications.
 
 ## Installation
 
 ```bash
-npm install @intastellar-solutions-international/signin-sdk-react-native
+npm install @intastellar/signin-sdk-react-native
 ```
+
+### Required Dependencies
+
+You also need to install the peer dependencies:
+
+```bash
+npm install @react-native-async-storage/async-storage react-native-inappbrowser-reborn
+```
+
+### iOS Setup (for react-native-inappbrowser-reborn)
+
+Run the following command:
+
+```bash
+cd ios && pod install
+```
+
+### Android Setup (for react-native-inappbrowser-reborn)
+
+No additional setup needed for Android.
 
 ## Usage
 
 ### Basic Usage
 
 ```jsx
-import { IntastellarButton } from "@intastellar-solutions-international/signin-sdk-react-native";
+import { IntastellarButton } from "@intastellar/signin-sdk-react-native";
 
 function App() {
   const handleLogin = (account) => {

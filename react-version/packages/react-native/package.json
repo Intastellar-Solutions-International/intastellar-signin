@@ -1,6 +1,6 @@
 {
   "name": "@intastellar/signin-sdk-react-native",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official Intastellar authentication SDK for React Native applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,7 +38,9 @@
   "homepage": "https://www.intastellaraccounts.com",
   "peerDependencies": {
     "react": ">=16.8.0",
-    "react-native": ">=0.60.0"
+    "react-native": ">=0.60.0",
+    "@react-native-async-storage/async-storage": ">=1.0.0",
+    "react-native-inappbrowser-reborn": ">=3.0.0"
   },
   "dependencies": {},
   "devDependencies": {

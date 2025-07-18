@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,17 +34,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.useIntastellar = useIntastellar;
-var react_1 = require("react");
-var api_1 = require("./api");
-var types_1 = require("./types");
-function useIntastellar(config) {
+import { useState, useCallback, useEffect } from 'react';
+import { IntastellarAPI } from './api';
+import { IntastellarError } from './types';
+export function useIntastellar(config) {
     var _this = this;
-    var _a = (0, react_1.useState)([]), users = _a[0], setUsers = _a[1];
-    var _b = (0, react_1.useState)(true), isLoading = _b[0], setIsLoading = _b[1];
-    var _c = (0, react_1.useState)(null), error = _c[0], setError = _c[1];
-    var _d = (0, react_1.useState)(false), isSignedIn = _d[0], setIsSignedIn = _d[1];
+    var _a = useState([]), users = _a[0], setUsers = _a[1];
+    var _b = useState(true), isLoading = _b[0], setIsLoading = _b[1];
+    var _c = useState(null), error = _c[0], setError = _c[1];
+    var _d = useState(false), isSignedIn = _d[0], setIsSignedIn = _d[1];
     var getCookie = function (name) {
         var _a;
         if (typeof document === 'undefined')
@@ -77,7 +74,7 @@ function useIntastellar(config) {
         }
         return domain.split(':')[0];
     };
-    var loadUsers = (0, react_1.useCallback)(function () { return __awaiter(_this, void 0, void 0, function () {
+    var loadUsers = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
         var fetchedUsers, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -85,7 +82,7 @@ function useIntastellar(config) {
                     _a.trys.push([0, 2, 3, 4]);
                     setIsLoading(true);
                     setError(null);
-                    return [4 /*yield*/, api_1.IntastellarAPI.getUsers()];
+                    return [4 /*yield*/, IntastellarAPI.getUsers()];
                 case 1:
                     fetchedUsers = _a.sent();
                     setUsers(fetchedUsers);
@@ -102,18 +99,18 @@ function useIntastellar(config) {
             }
         });
     }); }, []);
-    var signin = (0, react_1.useCallback)(function (email) { return __awaiter(_this, void 0, void 0, function () {
+    var signin = useCallback(function (email) { return __awaiter(_this, void 0, void 0, function () {
         var loginUri, loginUrl, loginWindow_1, messageListener_1, checkClosed_1;
         var _this = this;
         return __generator(this, function (_a) {
             try {
                 setError(null);
                 if (typeof window === 'undefined') {
-                    throw new types_1.IntastellarError('Window object not available');
+                    throw new IntastellarError('Window object not available');
                 }
                 loginUri = config.loginUri ||
                     "".concat(location.hostname).concat(location.port ? ':' + location.port : '').concat(location.pathname);
-                loginUrl = api_1.IntastellarAPI.buildLoginUrl({
+                loginUrl = IntastellarAPI.buildLoginUrl({
                     appName: config.appName,
                     clientId: config.clientId,
                     loginUri: loginUri,
@@ -122,7 +119,7 @@ function useIntastellar(config) {
                 });
                 loginWindow_1 = window.open(loginUrl, 'intastellarLogin', 'height=719,width=500,left=100,top=100,resizable=no');
                 if (!loginWindow_1) {
-                    throw new types_1.IntastellarError('Please enable popups for this website');
+                    throw new IntastellarError('Please enable popups for this website');
                 }
                 messageListener_1 = function (event) { return __awaiter(_this, void 0, void 0, function () {
                     var token, account, expires, hasQuery, separator, err_2;
@@ -135,7 +132,7 @@ function useIntastellar(config) {
                                 _a.label = 1;
                             case 1:
                                 _a.trys.push([1, 4, , 5]);
-                                return [4 /*yield*/, api_1.IntastellarAPI.verifyToken(token)];
+                                return [4 /*yield*/, IntastellarAPI.verifyToken(token)];
                             case 2:
                                 account = _a.sent();
                                 expires = new Date();
@@ -176,7 +173,7 @@ function useIntastellar(config) {
             return [2 /*return*/];
         });
     }); }, [config, loadUsers]);
-    var logout = (0, react_1.useCallback)(function () {
+    var logout = useCallback(function () {
         var domain = getDomain();
         if (typeof document !== 'undefined') {
             document.cookie = "inta_acc=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.".concat(domain, ";");
@@ -187,7 +184,7 @@ function useIntastellar(config) {
             window.location.reload();
         }
     }, []);
-    (0, react_1.useEffect)(function () {
+    useEffect(function () {
         loadUsers();
     }, [loadUsers]);
     return {

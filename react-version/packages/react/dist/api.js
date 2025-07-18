@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,9 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.IntastellarAPI = void 0;
-var types_1 = require("./types");
+import { IntastellarError } from './types';
 var IntastellarAPI = /** @class */ (function () {
     function IntastellarAPI() {
     }
@@ -99,7 +96,7 @@ var IntastellarAPI = /** @class */ (function () {
                                 }];
                         }
                         else {
-                            throw new types_1.IntastellarError(result.error);
+                            throw new IntastellarError(result.error);
                         }
                         return [2 /*return*/];
                 }
@@ -144,5 +141,5 @@ var IntastellarAPI = /** @class */ (function () {
     IntastellarAPI.baseUrl = 'https://apis.intastellaraccounts.com';
     return IntastellarAPI;
 }());
-exports.IntastellarAPI = IntastellarAPI;
+export { IntastellarAPI };
 //# sourceMappingURL=api.js.map

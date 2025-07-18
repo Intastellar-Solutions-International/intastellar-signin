@@ -1,13 +1,14 @@
 {
   "name": "@intastellar/signin-sdk-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official Intastellar authentication SDK for React applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "TROUBLESHOOTING.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -36,7 +37,16 @@
   },
   "homepage": "https://www.intastellaraccounts.com",
   "peerDependencies": {
-    "react": ">=16.8.0"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
+    }
   },
   "dependencies": {},
   "devDependencies": {

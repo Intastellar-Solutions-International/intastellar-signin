@@ -3,6 +3,14 @@ import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IntastellarUser, IntastellarAccount, IntastellarConfig, IntastellarError } from './types';
 
+// Optional import for InAppBrowser
+let InAppBrowser: any = null;
+try {
+  InAppBrowser = require('react-native-inappbrowser-reborn').InAppBrowser;
+} catch (e) {
+  console.warn('react-native-inappbrowser-reborn not found. Will use external browser.');
+}
+
 export interface UseIntastellarRNReturn {
   users: IntastellarUser[];
   isLoading: boolean;
@@ -87,7 +95,46 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
       
       const loginUrl = `${baseUrl}?${params.toString()}`;
       
-      await Linking.openURL(loginUrl);
+      // Try to open in-app browser, fallback to external browser
+      try {
+        if (InAppBrowser && await InAppBrowser.isAvailable()) {
+          const result = await InAppBrowser.open(loginUrl, {
+            // iOS Properties
+            dismissButtonStyle: 'cancel',
+            preferredBarTintColor: '#453AA4',
+            preferredControlTintColor: 'white',
+            readerMode: false,
+            animated: true,
+            modalPresentationStyle: 'fullScreen',
+            modalTransitionStyle: 'coverVertical',
+            modalEnabled: true,
+            enableBarCollapsing: false,
+            // Android Properties
+            showTitle: true,
+            toolbarColor: '#6200EE',
+            secondaryToolbarColor: 'black',
+            navigationBarColor: 'black',
+            navigationBarDividerColor: 'white',
+            enableUrlBarHiding: true,
+            enableDefaultShare: true,
+            forceCloseOnRedirection: false,
+            // Animation
+            animations: {
+              startEnter: 'slide_in_right',
+              startExit: 'slide_out_left',
+              endEnter: 'slide_in_left',
+              endExit: 'slide_out_right'
+            }
+          });
+          console.log('In-app browser result:', result);
+        } else {
+          // Fallback to external browser
+          await Linking.openURL(loginUrl);
+        }
+      } catch (browserError) {
+        console.warn('In-app browser failed, falling back to external browser:', browserError);
+        await Linking.openURL(loginUrl);
+      }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed');

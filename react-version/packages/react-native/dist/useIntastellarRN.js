@@ -2,6 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IntastellarError } from './types';
+// Optional import for InAppBrowser
+let InAppBrowser = null;
+try {
+    InAppBrowser = require('react-native-inappbrowser-reborn').InAppBrowser;
+}
+catch (e) {
+    console.warn('react-native-inappbrowser-reborn not found. Will use external browser.');
+}
 export function useIntastellarRN(config) {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +76,48 @@ export function useIntastellarRN(config) {
                 ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd'
                 : 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser';
             const loginUrl = `${baseUrl}?${params.toString()}`;
-            await Linking.openURL(loginUrl);
+            // Try to open in-app browser, fallback to external browser
+            try {
+                if (InAppBrowser && await InAppBrowser.isAvailable()) {
+                    const result = await InAppBrowser.open(loginUrl, {
+                        // iOS Properties
+                        dismissButtonStyle: 'cancel',
+                        preferredBarTintColor: '#453AA4',
+                        preferredControlTintColor: 'white',
+                        readerMode: false,
+                        animated: true,
+                        modalPresentationStyle: 'fullScreen',
+                        modalTransitionStyle: 'coverVertical',
+                        modalEnabled: true,
+                        enableBarCollapsing: false,
+                        // Android Properties
+                        showTitle: true,
+                        toolbarColor: '#6200EE',
+                        secondaryToolbarColor: 'black',
+                        navigationBarColor: 'black',
+                        navigationBarDividerColor: 'white',
+                        enableUrlBarHiding: true,
+                        enableDefaultShare: true,
+                        forceCloseOnRedirection: false,
+                        // Animation
+                        animations: {
+                            startEnter: 'slide_in_right',
+                            startExit: 'slide_out_left',
+                            endEnter: 'slide_in_left',
+                            endExit: 'slide_out_right'
+                        }
+                    });
+                    console.log('In-app browser result:', result);
+                }
+                else {
+                    // Fallback to external browser
+                    await Linking.openURL(loginUrl);
+                }
+            }
+            catch (browserError) {
+                console.warn('In-app browser failed, falling back to external browser:', browserError);
+                await Linking.openURL(loginUrl);
+            }
         }
         catch (err) {
             setError(err instanceof Error ? err.message : 'Sign in failed');
