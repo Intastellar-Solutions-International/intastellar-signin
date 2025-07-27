@@ -75,7 +75,7 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
       <img
         src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg"
         alt="Intastellar"
-        style={{ width: '18px', height: '18px' }}
+        style={{ width: '50px', height: '27px' }}
       />
       {children || getButtonText()}
     </button>

@@ -103,7 +103,7 @@ function useIntastellar(config) {
         });
     }); }, []);
     var signin = (0, react_1.useCallback)(function (email) { return __awaiter(_this, void 0, void 0, function () {
-        var loginUri, loginUrl, loginWindow_1, messageListener_1, checkClosed_1;
+        var loginUri, loginUrl, loginWindow_1, messageListener_1, checkClosed_1, cleanup;
         var _this = this;
         return __generator(this, function (_a) {
             try {
@@ -132,6 +132,8 @@ function useIntastellar(config) {
                                 token = event.data;
                                 if (!(token && typeof token === 'string')) return [3 /*break*/, 5];
                                 loginWindow_1.postMessage('iframe-token-received', event.origin);
+                                // Clean up event listener immediately
+                                window.removeEventListener('message', messageListener_1);
                                 _a.label = 1;
                             case 1:
                                 _a.trys.push([1, 4, , 5]);
@@ -144,13 +146,27 @@ function useIntastellar(config) {
                                 // Handle callback or redirect
                                 if (config.loginCallback) {
                                     config.loginCallback(account);
-                                    window.close();
+                                    // Use setTimeout to ensure callback completes before closing
+                                    setTimeout(function () {
+                                        if (!loginWindow_1.closed) {
+                                            loginWindow_1.close();
+                                        }
+                                    }, 100);
                                 }
                                 else if (config.loginUri) {
                                     hasQuery = window.location.href.includes('?');
                                     separator = hasQuery ? '&' : '?';
-                                    window.close();
                                     window.location.href = "".concat(window.location.protocol, "//").concat(config.loginUri).concat(separator, "token=").concat(JSON.stringify(account.user));
+                                    // Close window after redirect is initiated
+                                    setTimeout(function () {
+                                        if (!loginWindow_1.closed) {
+                                            loginWindow_1.close();
+                                        }
+                                    }, 100);
+                                }
+                                else {
+                                    // No callback or redirect specified, just close the window
+                                    loginWindow_1.close();
                                 }
                                 return [4 /*yield*/, loadUsers()];
                             case 3:
@@ -159,6 +175,10 @@ function useIntastellar(config) {
                             case 4:
                                 err_2 = _a.sent();
                                 setError(err_2 instanceof Error ? err_2.message : 'Authentication failed');
+                                // Close window on error too
+                                if (!loginWindow_1.closed) {
+                                    loginWindow_1.close();
+                                }
                                 return [3 /*break*/, 5];
                             case 5: return [2 /*return*/];
                         }
@@ -171,6 +191,15 @@ function useIntastellar(config) {
                         window.removeEventListener('message', messageListener_1);
                     }
                 }, 1000);
+                cleanup = function () {
+                    clearInterval(checkClosed_1);
+                    window.removeEventListener('message', messageListener_1);
+                    if (!loginWindow_1.closed) {
+                        loginWindow_1.close();
+                    }
+                };
+                // Store cleanup function for potential use
+                window.intastellarCleanup = cleanup;
             }
             catch (err) {
                 setError(err instanceof Error ? err.message : 'Sign in failed');

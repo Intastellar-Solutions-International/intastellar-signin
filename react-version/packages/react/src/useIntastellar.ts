@@ -96,6 +96,9 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
         if (token && typeof token === 'string') {
           loginWindow.postMessage('iframe-token-received', event.origin);
           
+          // Clean up event listener immediately
+          window.removeEventListener('message', messageListener);
+          
           try {
             const account = await IntastellarAPI.verifyToken(token);
             
@@ -107,30 +110,59 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
             // Handle callback or redirect
             if (config.loginCallback) {
               config.loginCallback(account);
-              loginWindow.close();
+              // Use setTimeout to ensure callback completes before closing
+              setTimeout(() => {
+                if (!loginWindow.closed) {
+                  loginWindow.close();
+                }
+              }, 100);
             } else if (config.loginUri) {
               const hasQuery = window.location.href.includes('?');
               const separator = hasQuery ? '&' : '?';
-              loginWindow.close();
               window.location.href = `${window.location.protocol}//${config.loginUri}${separator}token=${JSON.stringify(account.user)}`;
+              // Close window after redirect is initiated
+              setTimeout(() => {
+                if (!loginWindow.closed) {
+                  loginWindow.close();
+                }
+              }, 100);
+            } else {
+              // No callback or redirect specified, just close the window
+              loginWindow.close();
             }
             
             await loadUsers();
           } catch (err) {
             setError(err instanceof Error ? err.message : 'Authentication failed');
+            // Close window on error too
+            if (!loginWindow.closed) {
+              loginWindow.close();
+            }
           }
         }
       };
 
       window.addEventListener('message', messageListener);
 
-      // Check if window is closed
+      // Check if window is closed and clean up
       const checkClosed = setInterval(() => {
         if (loginWindow.closed) {
           clearInterval(checkClosed);
           window.removeEventListener('message', messageListener);
         }
       }, 1000);
+
+      // Cleanup function in case component unmounts
+      const cleanup = () => {
+        clearInterval(checkClosed);
+        window.removeEventListener('message', messageListener);
+        if (!loginWindow.closed) {
+          loginWindow.close();
+        }
+      };
+
+      // Store cleanup function for potential use
+      (window as any).intastellarCleanup = cleanup;
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed');
