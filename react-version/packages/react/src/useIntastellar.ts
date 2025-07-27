@@ -107,9 +107,11 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
             // Handle callback or redirect
             if (config.loginCallback) {
               config.loginCallback(account);
+              window.close();
             } else if (config.loginUri) {
               const hasQuery = window.location.href.includes('?');
               const separator = hasQuery ? '&' : '?';
+              window.close();
               window.location.href = `${window.location.protocol}//${config.loginUri}${separator}token=${JSON.stringify(account.user)}`;
             }
             
