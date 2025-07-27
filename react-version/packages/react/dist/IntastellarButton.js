@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -20,11 +21,13 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useIntastellar } from './useIntastellar';
-export var IntastellarButton = function (_a) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IntastellarButton = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var useIntastellar_1 = require("./useIntastellar");
+var IntastellarButton = function (_a) {
     var _b = _a.theme, theme = _b === void 0 ? { theme: 'light', picker: 'button' } : _b, _c = _a.className, className = _c === void 0 ? '' : _c, children = _a.children, style = _a.style, config = __rest(_a, ["theme", "className", "children", "style"]);
-    var _d = useIntastellar(config), users = _d.users, isLoading = _d.isLoading, signin = _d.signin, isSignedIn = _d.isSignedIn;
+    var _d = (0, useIntastellar_1.useIntastellar)(config), users = _d.users, isLoading = _d.isLoading, signin = _d.signin, isSignedIn = _d.isSignedIn;
     var handleClick = function () {
         if (users.length === 1) {
             signin(users[0].email);
@@ -42,10 +45,11 @@ export var IntastellarButton = function (_a) {
     };
     var buttonClasses = "\n    intastellar-signin-button\n    ".concat(theme.theme === 'dark' ? 'dark' : 'light', "\n    ").concat(className, "\n  ").trim();
     var defaultStyle = __assign({ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', border: '1px solid #dadce0', borderRadius: '4px', backgroundColor: theme.theme === 'dark' ? '#2d2d2d' : '#fff', color: theme.theme === 'dark' ? '#fff' : '#3c4043', fontSize: '14px', fontWeight: '500', cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease' }, style);
-    return (_jsxs("button", { className: buttonClasses, onClick: handleClick, disabled: isLoading, style: defaultStyle, children: [users.length === 1 && (_jsx("img", { src: users[0].image, alt: "Profile", style: {
+    return ((0, jsx_runtime_1.jsxs)("button", { className: buttonClasses, onClick: handleClick, disabled: isLoading, style: defaultStyle, children: [users.length === 1 && ((0, jsx_runtime_1.jsx)("img", { src: users[0].image, alt: "Profile", style: {
                     width: '20px',
                     height: '20px',
                     borderRadius: '50%',
-                } })), _jsx("img", { src: "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg", alt: "Intastellar", style: { width: '18px', height: '18px' } }), children || getButtonText()] }));
+                } })), (0, jsx_runtime_1.jsx)("img", { src: "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg", alt: "Intastellar", style: { width: '18px', height: '18px' } }), children || getButtonText()] }));
 };
+exports.IntastellarButton = IntastellarButton;
 //# sourceMappingURL=IntastellarButton.js.map

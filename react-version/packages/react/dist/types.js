@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -13,6 +14,8 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IntastellarError = void 0;
 var IntastellarError = /** @class */ (function (_super) {
     __extends(IntastellarError, _super);
     function IntastellarError(message) {
@@ -22,5 +25,5 @@ var IntastellarError = /** @class */ (function (_super) {
     }
     return IntastellarError;
 }(Error));
-export { IntastellarError };
+exports.IntastellarError = IntastellarError;
 //# sourceMappingURL=types.js.map

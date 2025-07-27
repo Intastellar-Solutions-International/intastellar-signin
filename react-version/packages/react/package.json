@@ -1,6 +1,6 @@
 {
   "name": "@intastellar/signin-sdk-react",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Official Intastellar authentication SDK for React applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
