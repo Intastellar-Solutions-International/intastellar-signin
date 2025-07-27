@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import { IntastellarButton } from '@intastellar-solutions-international/signin-sdk/react-native';
+import { IntastellarButton } from '@intastellar/signin-sdk-react-native';
 
 export default function App() {
   const handleLogin = (account) => {

@@ -1,5 +1,5 @@
 {
-  "name": "@intastellar-solutions-international/signin-sdk",
+  "name": "@intastellar/signin-sdk",
   "version": "1.0.21",
   "description": "Official Intastellar authentication SDK for React and React Native applications",
   "main": "dist/index.js",

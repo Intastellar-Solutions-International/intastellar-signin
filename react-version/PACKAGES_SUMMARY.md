@@ -5,7 +5,7 @@
 ### 1. React Package
 
 - **Package Name**: `@intastellar/signin-sdk-react`
-- **Version**: 1.0.0
+- **Version**: 1.0.1
 - **NPM URL**: https://www.npmjs.com/package/@intastellar/signin-sdk-react
 - **Installation**: `npm install @intastellar/signin-sdk-react`
 
@@ -19,7 +19,7 @@
 ### 2. React Native Package
 
 - **Package Name**: `@intastellar/signin-sdk-react-native`
-- **Version**: 1.0.0
+- **Version**: 1.0.1
 - **NPM URL**: https://www.npmjs.com/package/@intastellar/signin-sdk-react-native
 - **Installation**: `npm install @intastellar/signin-sdk-react-native`
 
@@ -27,6 +27,7 @@
 
 - React Native hooks for authentication (`useIntastellarRN`)
 - Mobile-optimized button component
+- **In-app browser support** for seamless authentication
 - AsyncStorage integration for token persistence
 - Deep linking support
 - TypeScript support
