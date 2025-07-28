@@ -104,7 +104,7 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
         key: config.clientId,
         passive: 'true',
         flowName: 'GeneralOAuthFlow',
-        Entry: 'webauthsignin',
+        Entry: 'reactauthsignin',
         scope: config.scopes || 'profile',
       });
       
