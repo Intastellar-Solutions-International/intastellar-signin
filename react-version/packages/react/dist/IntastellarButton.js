@@ -45,11 +45,13 @@ var IntastellarButton = function (_a) {
     };
     var buttonClasses = "\n    intastellar-signin-button\n    ".concat(theme.theme === 'dark' ? 'dark' : 'light', "\n    ").concat(className, "\n  ").trim();
     var defaultStyle = __assign({ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', border: '1px solid #dadce0', borderRadius: '4px', backgroundColor: theme.theme === 'dark' ? '#2d2d2d' : '#fff', color: theme.theme === 'dark' ? '#fff' : '#3c4043', fontSize: '14px', fontWeight: '500', cursor: isLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease' }, style);
-    return ((0, jsx_runtime_1.jsxs)("button", { className: buttonClasses, onClick: handleClick, disabled: isLoading, style: defaultStyle, children: [users.length === 1 && ((0, jsx_runtime_1.jsx)("img", { src: users[0].image, alt: "Profile", style: {
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                } })), (0, jsx_runtime_1.jsx)("img", { src: "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg", alt: "Intastellar", style: { width: '18px', height: '18px' } }), children || getButtonText()] }));
+    return ((0, jsx_runtime_1.jsx)("button", { className: buttonClasses, onClick: handleClick, disabled: isLoading, style: defaultStyle, children: users.length === 1 ?
+            (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("img", { src: users[0].image, alt: "Profile", style: {
+                            width: '35px',
+                            height: '35px',
+                            borderRadius: '50%',
+                        } }), children || getButtonText(), (0, jsx_runtime_1.jsx)("img", { src: "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg", alt: "Intastellar", style: { width: '50px', height: '27px' } })] }) :
+            (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("img", { src: "https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg", alt: "Intastellar", style: { width: '50px', height: '27px' } }), children || getButtonText()] }) }));
 };
 exports.IntastellarButton = IntastellarButton;
 //# sourceMappingURL=IntastellarButton.js.map
