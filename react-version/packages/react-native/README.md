@@ -53,7 +53,7 @@ function App() {
 ### Using the Hook
 
 ```jsx
-import { useIntastellarRN } from "@intastellar-solutions-international/signin-sdk-react-native";
+import { useIntastellarRN } from "@intastellar/signin-sdk-react-native";
 
 function MyComponent() {
   const { users, isLoading, signin, logout, isSignedIn } = useIntastellarRN({
@@ -82,7 +82,6 @@ function MyComponent() {
 | Property        | Type     | Required | Description                               |
 | --------------- | -------- | -------- | ----------------------------------------- |
 | `clientId`      | string   | Yes      | Your Intastellar application client ID    |
-| `baseUrl`       | string   | Yes      | Intastellar API base URL                  |
 | `loginUri`      | string   | Yes      | Deep link URI for authentication redirect |
 | `scopes`        | string   | No       | OAuth scopes (default: "profile,email")   |
 | `theme`         | object   | No       | Theme configuration                       |
