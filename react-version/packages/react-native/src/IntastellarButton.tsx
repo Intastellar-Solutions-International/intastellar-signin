@@ -54,25 +54,41 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
         <ActivityIndicator color={isDark ? '#fff' : '#3c4043'} />
       ) : (
         <View style={styles.content}>
-          {users.length === 1 && (
-            <ReactNativeImage
-              source={{ uri: users[0].image }}
-              style={styles.profileImage}
-              resizeMode="cover"
-            />
-          )}
-          <ReactNativeImage
-            source={{ uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.png' }}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={[
-            styles.text,
-            isDark ? styles.darkText : styles.lightText,
-            textStyle,
-          ]}>
-            {getButtonText()}
-          </Text>
+          {users.length === 1 ?
+            <>
+              <ReactNativeImage
+                  source={{ uri: users[0].image }}
+                  style={styles.profileImage}
+                  resizeMode="cover"
+                />
+                <Text style={[
+                styles.text,
+                isDark ? styles.darkText : styles.lightText,
+                textStyle,
+              ]}>
+                {getButtonText()}
+              </Text>
+              <ReactNativeImage
+                source={{ uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.png' }}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </>
+          : <>
+              <ReactNativeImage
+                source={{ uri: 'https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.png' }}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+                <Text style={[
+                styles.text,
+                isDark ? styles.darkText : styles.lightText,
+                textStyle,
+              ]}>
+                {getButtonText()}
+              </Text>
+          </>}
+          
         </View>
       )}
     </TouchableOpacity>
