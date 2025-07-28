@@ -1,6 +1,6 @@
 # @intastellar/signin-sdk-react-native
 
-Official Intastellar authentication SDK for React Native applications.
+Official Intastellar authentication SDK for React Native applications with support for both Expo and bare React Native projects.
 
 ## Installation
 
@@ -8,25 +8,41 @@ Official Intastellar authentication SDK for React Native applications.
 npm install @intastellar/signin-sdk-react-native
 ```
 
-### Required Dependencies
+### Dependencies for Bare React Native
 
-You also need to install the peer dependencies:
+If you're using a **bare React Native** project, install these dependencies:
 
 ```bash
 npm install @react-native-async-storage/async-storage react-native-inappbrowser-reborn
 ```
 
-### iOS Setup (for react-native-inappbrowser-reborn)
+### Dependencies for Expo
 
-Run the following command:
+If you're using **Expo** (managed workflow), install these dependencies:
+
+```bash
+npx expo install @react-native-async-storage/async-storage expo-web-browser expo-constants
+```
+
+### iOS Setup (Bare React Native only)
+
+For bare React Native projects, run:
 
 ```bash
 cd ios && pod install
 ```
 
-### Android Setup (for react-native-inappbrowser-reborn)
+### Android Setup
 
-No additional setup needed for Android.
+No additional setup needed for Android in either Expo or bare React Native projects.
+
+## Platform Support
+
+This SDK automatically detects whether you're using Expo or bare React Native and uses the appropriate browser implementation:
+
+- **Expo projects**: Uses `expo-web-browser` for in-app authentication
+- **Bare React Native**: Uses `react-native-inappbrowser-reborn` for in-app authentication
+- **Fallback**: Falls back to the device's default browser if in-app browsing is unavailable
 
 ## Usage
 

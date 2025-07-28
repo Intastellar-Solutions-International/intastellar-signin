@@ -2,13 +2,36 @@ import { useState, useEffect, useCallback } from 'react';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IntastellarError } from './types';
-// Optional import for InAppBrowser
+// Optional imports for different in-app browser solutions
 let InAppBrowser = null;
+let ExpoWebBrowser = null;
+let isExpo = false;
+// Check if running in Expo
 try {
-    InAppBrowser = require('react-native-inappbrowser-reborn').InAppBrowser;
+    require('expo-constants');
+    isExpo = true;
 }
 catch (e) {
-    console.warn('react-native-inappbrowser-reborn not found. Will use external browser.');
+    isExpo = false;
+}
+// Import appropriate browser library
+if (isExpo) {
+    try {
+        ExpoWebBrowser = require('expo-web-browser');
+        console.log('Expo WebBrowser loaded successfully');
+    }
+    catch (e) {
+        console.warn('expo-web-browser not found. Will use external browser.');
+    }
+}
+else {
+    try {
+        InAppBrowser = require('react-native-inappbrowser-reborn').InAppBrowser;
+        console.log('React Native InAppBrowser loaded successfully');
+    }
+    catch (e) {
+        console.warn('react-native-inappbrowser-reborn not found. Will use external browser.');
+    }
 }
 export function useIntastellarRN(config) {
     const [users, setUsers] = useState([]);
@@ -76,46 +99,69 @@ export function useIntastellarRN(config) {
                 ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd'
                 : 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser';
             const loginUrl = `${baseUrl}?${params.toString()}`;
-            // Try to open in-app browser, fallback to external browser
+            // Handle Expo vs bare React Native browser opening
             try {
-                if (InAppBrowser && await InAppBrowser.isAvailable()) {
-                    const result = await InAppBrowser.open(loginUrl, {
-                        // iOS Properties
-                        dismissButtonStyle: 'cancel',
-                        preferredBarTintColor: '#453AA4',
-                        preferredControlTintColor: 'white',
-                        readerMode: false,
-                        animated: true,
-                        modalPresentationStyle: 'fullScreen',
-                        modalTransitionStyle: 'coverVertical',
-                        modalEnabled: true,
-                        enableBarCollapsing: false,
-                        // Android Properties
-                        showTitle: true,
-                        toolbarColor: '#6200EE',
-                        secondaryToolbarColor: 'black',
-                        navigationBarColor: 'black',
-                        navigationBarDividerColor: 'white',
-                        enableUrlBarHiding: true,
-                        enableDefaultShare: true,
-                        forceCloseOnRedirection: false,
-                        // Animation
-                        animations: {
-                            startEnter: 'slide_in_right',
-                            startExit: 'slide_out_left',
-                            endEnter: 'slide_in_left',
-                            endExit: 'slide_out_right'
-                        }
-                    });
-                    console.log('In-app browser result:', result);
+                if (isExpo) {
+                    console.log('Opening URL with Expo WebBrowser');
+                    if (ExpoWebBrowser) {
+                        const result = await ExpoWebBrowser.openBrowserAsync(loginUrl, {
+                            // Expo WebBrowser options
+                            presentationStyle: ExpoWebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
+                            controlsColor: '#6200EE',
+                            toolbarColor: '#6200EE',
+                            enableBarCollapsing: false,
+                            showInRecents: false,
+                            enableDefaultShare: false,
+                            readerMode: false,
+                        });
+                        console.log('Expo WebBrowser result:', result);
+                    }
+                    else {
+                        console.warn('Expo WebBrowser not available, falling back to Linking');
+                        await Linking.openURL(loginUrl);
+                    }
                 }
                 else {
-                    // Fallback to external browser
-                    await Linking.openURL(loginUrl);
+                    console.log('Opening URL with react-native-inappbrowser-reborn');
+                    if (InAppBrowser && await InAppBrowser.isAvailable()) {
+                        const result = await InAppBrowser.open(loginUrl, {
+                            // iOS Properties
+                            dismissButtonStyle: 'cancel',
+                            preferredBarTintColor: '#453AA4',
+                            preferredControlTintColor: 'white',
+                            readerMode: false,
+                            animated: true,
+                            modalPresentationStyle: 'fullScreen',
+                            modalTransitionStyle: 'coverVertical',
+                            modalEnabled: true,
+                            enableBarCollapsing: false,
+                            // Android Properties
+                            showTitle: true,
+                            toolbarColor: '#6200EE',
+                            secondaryToolbarColor: 'black',
+                            navigationBarColor: 'black',
+                            navigationBarDividerColor: 'white',
+                            enableUrlBarHiding: true,
+                            enableDefaultShare: true,
+                            forceCloseOnRedirection: false,
+                            // Animation
+                            animations: {
+                                startEnter: 'slide_in_right',
+                                startExit: 'slide_out_left',
+                                endEnter: 'slide_in_left',
+                                endExit: 'slide_out_right'
+                            }
+                        });
+                        console.log('In-app browser result:', result);
+                    }
+                    else {
+                        console.warn('InAppBrowser not available, falling back to Linking');
+                        await Linking.openURL(loginUrl);
+                    }
                 }
             }
             catch (browserError) {
-                console.warn('In-app browser failed, falling back to external browser:', browserError);
+                console.warn('Browser opening failed, falling back to external browser:', browserError);
                 await Linking.openURL(loginUrl);
             }
         }
