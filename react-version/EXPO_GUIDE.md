@@ -17,11 +17,13 @@ The SDK automatically detects if you're running in an Expo environment by checki
 ## Platform-Specific Behavior
 
 ### Expo Managed Workflow
+
 - Uses `expo-web-browser` for in-app authentication
 - Provides a smooth, native-like experience
 - No need to install `react-native-inappbrowser-reborn`
 
 ### Bare React Native Projects
+
 - Uses `react-native-inappbrowser-reborn` for in-app authentication
 - Requires iOS pod installation for bare React Native
 - Fallback to system browser if in-app browser fails
@@ -29,17 +31,17 @@ The SDK automatically detects if you're running in an Expo environment by checki
 ## Example Usage
 
 ```jsx
-import React from 'react';
-import { View, Text } from 'react-native';
-import { IntastellarButton } from '@intastellar/signin-sdk-react-native';
+import React from "react";
+import { View, Text } from "react-native";
+import { IntastellarButton } from "@intastellar/signin-sdk-react-native";
 
 export default function App() {
   const handleLogin = (account) => {
-    console.log('User logged in:', account);
+    console.log("User logged in:", account);
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text>Welcome to Intastellar Auth</Text>
       <IntastellarButton
         clientId="your-client-id"
@@ -67,13 +69,13 @@ export default function App() {
 ### Linking Configuration
 
 ```jsx
-import { Linking } from 'expo-linking';
+import { Linking } from "expo-linking";
 
 const linking = {
-  prefixes: ['myapp://'],
+  prefixes: ["myapp://"],
   config: {
     screens: {
-      Auth: 'auth',
+      Auth: "auth",
     },
   },
 };
@@ -82,6 +84,7 @@ const linking = {
 ## Testing
 
 You can test the authentication flow in:
+
 - Expo Go (development)
 - Development builds
 - Production builds
@@ -91,11 +94,13 @@ The SDK will automatically choose the correct browser implementation based on yo
 ## Troubleshooting
 
 ### Browser Not Opening
+
 - Ensure you have the correct dependencies installed
 - Check that your deep link scheme is properly configured
 - Verify your `loginUri` matches your app's URL scheme
 
 ### Authentication Not Working
+
 - Confirm your `clientId` is correct
 - Check that your deep link is properly registered
 - Look at console logs for debugging information
