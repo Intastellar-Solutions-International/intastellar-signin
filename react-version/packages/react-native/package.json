@@ -1,6 +1,6 @@
 {
   "name": "@intastellar/signin-sdk-react-native",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "Official Intastellar authentication SDK for React Native applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
