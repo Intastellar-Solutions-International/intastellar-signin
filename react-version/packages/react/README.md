@@ -1,4 +1,4 @@
-# @intastellar-solutions-international/signin-sdk-react
+# @intastellar/signin-sdk-react
 
 Official Intastellar authentication SDK for React applications.
 
