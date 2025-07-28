@@ -43,7 +43,6 @@ function App() {
   return (
     <IntastellarButton
       clientId="your-client-id"
-      baseUrl="https://api.intastellar.app"
       loginUri="myapp://auth"
       loginCallback={handleLogin}
     />
@@ -59,7 +58,6 @@ import { useIntastellarRN } from "@intastellar-solutions-international/signin-sd
 function MyComponent() {
   const { users, isLoading, signin, logout, isSignedIn } = useIntastellarRN({
     clientId: "your-client-id",
-    baseUrl: "https://api.intastellar.app",
     loginUri: "myapp://auth",
   });
 
