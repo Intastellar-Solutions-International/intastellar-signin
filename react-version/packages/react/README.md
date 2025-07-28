@@ -5,7 +5,7 @@ Official Intastellar authentication SDK for React applications.
 ## Installation
 
 ```bash
-npm install @intastellar-solutions-international/signin-sdk-react
+npm install @intastellar/signin-sdk-react
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ npm install @intastellar-solutions-international/signin-sdk-react
 ### Basic Usage
 
 ```jsx
-import { IntastellarButton } from "@intastellar-solutions-international/signin-sdk-react";
+import { IntastellarButton } from "@intastellar/signin-sdk-react";
 
 function App() {
   const handleLogin = (account) => {
@@ -33,7 +33,7 @@ function App() {
 ### Using the Hook
 
 ```jsx
-import { useIntastellar } from "@intastellar-solutions-international/signin-sdk-react";
+import { useIntastellar } from "@intastellar/signin-sdk-react";
 
 function MyComponent() {
   const { users, isLoading, signin, logout, isSignedIn } = useIntastellar({
