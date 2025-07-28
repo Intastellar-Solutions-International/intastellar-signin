@@ -21,11 +21,7 @@ function App() {
   };
 
   return (
-    <IntastellarButton
-      clientId="your-client-id"
-      baseUrl="https://api.intastellar.app"
-      loginCallback={handleLogin}
-    />
+    <IntastellarButton clientId="your-client-id" loginCallback={handleLogin} />
   );
 }
 ```
@@ -38,7 +34,6 @@ import { useIntastellar } from "@intastellar/signin-sdk-react";
 function MyComponent() {
   const { users, isLoading, signin, logout, isSignedIn } = useIntastellar({
     clientId: "your-client-id",
-    baseUrl: "https://api.intastellar.app",
   });
 
   return (
@@ -58,7 +53,6 @@ function MyComponent() {
 | Property        | Type     | Required | Description                             |
 | --------------- | -------- | -------- | --------------------------------------- |
 | `clientId`      | string   | Yes      | Your Intastellar application client ID  |
-| `baseUrl`       | string   | Yes      | Intastellar API base URL                |
 | `scopes`        | string   | No       | OAuth scopes (default: "profile,email") |
 | `theme`         | object   | No       | Theme configuration                     |
 | `loginCallback` | function | No       | Callback when login succeeds            |
