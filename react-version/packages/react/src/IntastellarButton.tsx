@@ -61,23 +61,34 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
       disabled={isLoading}
       style={defaultStyle}
     >
-      {users.length === 1 && (
-        <img
+      {users.length === 1 ?
+        <>
+          <img
           src={users[0].image}
           alt="Profile"
           style={{
-            width: '20px',
-            height: '20px',
+            width: '35px',
+            height: '35px',
             borderRadius: '50%',
           }}
         />
-      )}
-      <img
-        src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg"
-        alt="Intastellar"
-        style={{ width: '50px', height: '27px' }}
-      />
-      {children || getButtonText()}
+        {children || getButtonText()}
+          <img
+          src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg"
+          alt="Intastellar"
+          style={{ width: '50px', height: '27px' }}
+        />
+        </> : 
+        <>
+          <img
+            src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg"
+            alt="Intastellar"
+            style={{ width: '50px', height: '27px' }}
+          />
+              {children || getButtonText()}
+        </>
+      }
+      
     </button>
   );
 };
