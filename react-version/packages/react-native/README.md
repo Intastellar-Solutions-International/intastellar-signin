@@ -36,6 +36,15 @@ cd ios && pod install
 
 No additional setup needed for Android in either Expo or bare React Native projects.
 
+## Features
+
+- **Automatic Platform Detection**: Detects Expo vs bare React Native environments automatically
+- **Cross-Platform Browser Support**: Uses appropriate in-app browser for each platform
+- **Automatic Browser Closing**: Closes in-app browser automatically when authentication completes
+- **Fallback Support**: Falls back to system browser if in-app browsing is unavailable
+- **TypeScript Support**: Full TypeScript definitions included
+- **Deep Link Handling**: Automatic handling of authentication redirects
+
 ## Platform Support
 
 This SDK automatically detects whether you're using Expo or bare React Native and uses the appropriate browser implementation:

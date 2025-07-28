@@ -47,6 +47,7 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [activeBrowserSession, setActiveBrowserSession] = useState<any>(null);
 
   const verifyToken = async (token: string): Promise<IntastellarAccount> => {
     const response = await fetch('https://apis.intastellaraccounts.com/verify', {
@@ -122,17 +123,18 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
         if (isExpo) {
           console.log('Opening URL with Expo WebBrowser');
           if (ExpoWebBrowser) {
+            // For Expo, we don't get a session reference, browser closes automatically on redirect
+            setActiveBrowserSession({ type: 'expo' });
             const result = await ExpoWebBrowser.openBrowserAsync(loginUrl, {
               // Expo WebBrowser options
               presentationStyle: ExpoWebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
-              controlsColor: '#6200EE',
-              toolbarColor: '#6200EE',
               enableBarCollapsing: false,
               showInRecents: false,
               enableDefaultShare: false,
               readerMode: false,
             });
             console.log('Expo WebBrowser result:', result);
+            setActiveBrowserSession(null);
           } else {
             console.warn('Expo WebBrowser not available, falling back to Linking');
             await Linking.openURL(loginUrl);
@@ -140,10 +142,11 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
         } else {
           console.log('Opening URL with react-native-inappbrowser-reborn');
           if (InAppBrowser && await InAppBrowser.isAvailable()) {
+            // Store the browser session for manual closing later
+            setActiveBrowserSession({ type: 'inappbrowser', instance: InAppBrowser });
             const result = await InAppBrowser.open(loginUrl, {
               // iOS Properties
               dismissButtonStyle: 'cancel',
-              preferredBarTintColor: '#453AA4',
               preferredControlTintColor: 'white',
               readerMode: false,
               animated: true,
@@ -153,7 +156,6 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
               enableBarCollapsing: false,
               // Android Properties
               showTitle: true,
-              toolbarColor: '#6200EE',
               secondaryToolbarColor: 'black',
               navigationBarColor: 'black',
               navigationBarDividerColor: 'white',
@@ -169,6 +171,7 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
               }
             });
             console.log('In-app browser result:', result);
+            setActiveBrowserSession(null);
           } else {
             console.warn('InAppBrowser not available, falling back to Linking');
             await Linking.openURL(loginUrl);
@@ -176,13 +179,33 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
         }
       } catch (browserError) {
         console.warn('Browser opening failed, falling back to external browser:', browserError);
+        setActiveBrowserSession(null);
         await Linking.openURL(loginUrl);
       }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed');
+      setActiveBrowserSession(null);
     }
   }, [config]);
+
+  const closeBrowser = useCallback(async () => {
+    if (activeBrowserSession) {
+      try {
+        if (activeBrowserSession.type === 'inappbrowser' && activeBrowserSession.instance) {
+          console.log('Closing InAppBrowser session');
+          await activeBrowserSession.instance.close();
+        } else if (activeBrowserSession.type === 'expo' && ExpoWebBrowser) {
+          console.log('Dismissing Expo WebBrowser session');
+          await ExpoWebBrowser.dismissBrowser();
+        }
+      } catch (error) {
+        console.warn('Error closing browser:', error);
+      } finally {
+        setActiveBrowserSession(null);
+      }
+    }
+  }, [activeBrowserSession]);
 
   const handleDeepLink = useCallback(async (url: string) => {
     try {
@@ -190,6 +213,9 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
       const token = urlObj.searchParams.get('token');
       
       if (token) {
+        // Close the in-app browser when token is received
+        await closeBrowser();
+        
         const account = await verifyToken(token);
         await AsyncStorage.setItem('intastellar_token', token);
         
@@ -203,7 +229,7 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
     }
-  }, [config.loginCallback]);
+  }, [config.loginCallback, closeBrowser]);
 
   const logout = useCallback(async () => {
     await AsyncStorage.removeItem('intastellar_token');
