@@ -90,7 +90,7 @@ export function useIntastellarRN(config) {
                 key: config.clientId,
                 passive: 'true',
                 flowName: 'GeneralOAuthFlow',
-                Entry: 'webauthsignin',
+                Entry: 'reactauthsignin',
                 scope: config.scopes || 'profile',
             });
             if (email) {

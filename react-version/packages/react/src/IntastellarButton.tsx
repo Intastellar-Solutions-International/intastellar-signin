@@ -7,6 +7,7 @@ interface IntastellarButtonProps extends IntastellarConfig {
   className?: string;
   children?: React.ReactNode;
   style?: React.CSSProperties;
+  type?: 'signin' | 'signup';
 }
 
 export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
@@ -14,6 +15,7 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
   className = '',
   children,
   style,
+  type,
   ...config
 }) => {
   const { users, isLoading, signin, isSignedIn } = useIntastellar(config);
@@ -26,10 +28,12 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
     }
   };
 
+  const buttonType = type === 'signup' ? 'Sign up' : 'Sign in';
+
   const getButtonText = () => {
     if (isLoading) return 'Loading...';
     if (users.length === 1) return `Continue as ${users[0].name.first}`;
-    return 'Sign in with Intastellar';
+    return `${buttonType} with Intastellar`;
   };
 
   const buttonClasses = `
@@ -37,6 +41,7 @@ export const IntastellarButton: React.FC<IntastellarButtonProps> = ({
     ${theme.theme === 'dark' ? 'dark' : 'light'}
     ${className}
   `.trim();
+
 
   const defaultStyle: React.CSSProperties = {
     display: 'flex',
