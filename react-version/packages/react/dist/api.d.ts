@@ -9,6 +9,7 @@ export declare class IntastellarAPI {
         loginUri: string;
         scopes: string;
         email?: string;
+        type?: 'signin' | 'signup';
     }): string;
 }
 //# sourceMappingURL=api.d.ts.map

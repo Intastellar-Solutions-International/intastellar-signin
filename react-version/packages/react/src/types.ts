@@ -25,6 +25,7 @@ export interface IntastellarConfig {
   appName: string;
   clientId: string;
   loginUri?: string;
+  type?: 'signin' | 'signup';
   loginCallback?: (account: IntastellarAccount) => void;
   scopes?: string;
 }

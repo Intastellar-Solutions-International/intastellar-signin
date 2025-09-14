@@ -59,9 +59,10 @@ export class IntastellarAPI {
     loginUri: string;
     scopes: string;
     email?: string;
+    type?: 'signin' | 'signup';
   }): string {
-    const { appName, clientId, loginUri, scopes, email } = config;
-    
+    const { appName, clientId, loginUri, scopes, email, type } = config;
+
     let domain = '';
     if (typeof window !== 'undefined') {
       domain = window.location.hostname || window.location.host;
@@ -79,6 +80,8 @@ export class IntastellarAPI {
     
     const baseUrl = email 
       ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd'
+      : type === 'signup'
+      ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/signup'
       : 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser';
     
     const params = new URLSearchParams({

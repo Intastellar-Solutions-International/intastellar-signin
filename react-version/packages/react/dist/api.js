@@ -107,7 +107,7 @@ var IntastellarAPI = /** @class */ (function () {
         });
     };
     IntastellarAPI.buildLoginUrl = function (config) {
-        var appName = config.appName, clientId = config.clientId, loginUri = config.loginUri, scopes = config.scopes, email = config.email;
+        var appName = config.appName, clientId = config.clientId, loginUri = config.loginUri, scopes = config.scopes, email = config.email, type = config.type;
         var domain = '';
         if (typeof window !== 'undefined') {
             domain = window.location.hostname || window.location.host;
@@ -124,7 +124,9 @@ var IntastellarAPI = /** @class */ (function () {
         }
         var baseUrl = email
             ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd'
-            : 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser';
+            : type === 'signup'
+                ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/signup'
+                : 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser';
         var params = new URLSearchParams({
             service: appName,
             continue: loginUri,
