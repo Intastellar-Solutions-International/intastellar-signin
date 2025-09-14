@@ -5,6 +5,7 @@ interface IntastellarButtonProps extends IntastellarConfig {
     className?: string;
     children?: React.ReactNode;
     style?: React.CSSProperties;
+    type?: 'signin' | 'signup';
 }
 export declare const IntastellarButton: React.FC<IntastellarButtonProps>;
 export {};
