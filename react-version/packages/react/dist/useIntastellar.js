@@ -119,6 +119,7 @@ function useIntastellar(config) {
                     loginUri: loginUri,
                     scopes: config.scopes || 'profile',
                     email: email,
+                    type: config.type || 'signin',
                 });
                 loginWindow_1 = window.open(loginUrl, 'intastellarLogin', 'height=719,width=500,left=100,top=100,resizable=no');
                 if (!loginWindow_1) {

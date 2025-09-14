@@ -125,7 +125,7 @@ var IntastellarAPI = /** @class */ (function () {
         var baseUrl = email
             ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd'
             : type === 'signup'
-                ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/signup'
+                ? 'https://www.intastellaraccounts.com/Signup/'
                 : 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser';
         var params = new URLSearchParams({
             service: appName,

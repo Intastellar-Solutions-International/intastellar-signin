@@ -77,6 +77,7 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
         loginUri,
         scopes: config.scopes || 'profile',
         email,
+        type: config.type || 'signin',
       });
 
       const loginWindow = window.open(
