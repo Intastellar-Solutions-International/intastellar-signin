@@ -122,7 +122,7 @@ var IntastellarAPI = /** @class */ (function () {
                 domain += ':' + window.location.port;
             }
         }
-        var baseUrl = email
+        var baseUrl = email && type === 'signin'
             ? 'https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd'
             : type === 'signup'
                 ? 'https://www.intastellaraccounts.com/Signup/'
