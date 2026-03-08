@@ -269,6 +269,7 @@ const Intastellar = {
                 }
 
                 const IntastellarLogo = document.createElement("img");
+                IntastellarLogo.setAttribute("alt", "Intastellar logo");
                 IntastellarLogo.setAttribute("src", intastellarLogoSrc)
                 IntastellarLogo.setAttribute("class", "intastellar-logo");
                 IntastellarSigninButton.appendChild(IntastellarLogo);
@@ -276,7 +277,7 @@ const Intastellar = {
 
                 const IntastellarSigniniFrame = document.createElement("iframe");
                 IntastellarSigniniFrame.setAttribute("id", "intastellar-signin-iframe");
-                IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button.php?v=" + Math.random());
+                IntastellarSigniniFrame.setAttribute("src", "https://apis.intastellaraccounts.com/usercontent/button?v=" + Math.random());
                 let appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
                 if (theme.picker == "popup" && theme.appName != null) {
                     appName = theme.appName;
@@ -302,7 +303,7 @@ const Intastellar = {
                 const intastellarPopupContent = document.createElement("div");
                 intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
-                            <img src="https://www.intastellarsolutions.com/assets/logos/intastellar-new-planet.svg" class="logo">
+                            <img src="${intastellarLogoSrc}" class="logo" alt="Intastellar logo">
                             <p class="header-info">Sign into ${appName} with Intastellar</p>
                             <button class="close-popup" onclick="closeSignIn()">
                                 <svg class="Bz112c Bz112c-r9oPif" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path><path fill="none" d="M0 0h24v24H0z"></path></svg>
@@ -362,7 +363,7 @@ const Intastellar = {
                                 intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
                                 intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
                             }
-                            loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "'>";
+                            loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "' alt='user profile image'>";
                         } else {
 
                             if (user && user2.length == 0) {
@@ -370,12 +371,12 @@ const Intastellar = {
                             }
 
                             if (user) {
-                                document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
+                                document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile" alt="user profile image"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
                                 document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
                             }
 
                             if (user2) {
-                                document.querySelector(".intastellar-popup-user").innerHTML = `<img src="${user2.image}" class="intastellar-popup-userProfile"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
+                                document.querySelector(".intastellar-popup-user").innerHTML = `<img src="${user2.image}" class="intastellar-popup-userProfile" alt="user profile image"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
                             }
 
                             if (user && user2) {
