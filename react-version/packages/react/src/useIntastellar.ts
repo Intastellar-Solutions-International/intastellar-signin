@@ -52,13 +52,35 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
       setError(null);
       const fetchedUsers = await IntastellarAPI.getUsers();
       setUsers(fetchedUsers);
-      setIsSignedIn(fetchedUsers.length > 0);
+      const hasAppToken =
+        typeof document !== 'undefined' && !!getCookie('inta_acc');
+      setIsSignedIn(fetchedUsers.length > 0 || hasAppToken);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load users');
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  const completeLoginFromStoredToken = useCallback(
+    async (token: string) => {
+      const account = await IntastellarAPI.verifyToken(token);
+      const expires = new Date();
+      expires.setFullYear(expires.getFullYear() + 2);
+      setCookie('inta_acc', token, getDomain(), expires);
+
+      if (config.loginCallback) {
+        config.loginCallback(account);
+      } else if (config.loginUri) {
+        const hasQuery = window.location.href.includes('?');
+        const separator = hasQuery ? '&' : '?';
+        window.location.href = `${window.location.protocol}//${config.loginUri}${separator}token=${JSON.stringify(account.user)}`;
+      }
+
+      await loadUsers();
+    },
+    [config, loadUsers]
+  );
 
   const signin = useCallback(async (email?: string) => {
     try {
@@ -67,7 +89,17 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
       if (typeof window === 'undefined') {
         throw new IntastellarError('Window object not available');
       }
-      
+
+      const appToken = getCookie('inta_acc');
+      if (appToken && users.length > 0) {
+        try {
+          await completeLoginFromStoredToken(appToken);
+          return;
+        } catch {
+          // Stale token or verify failure — fall through to OAuth popup
+        }
+      }
+
       const loginUri = config.loginUri || 
         `${location.hostname}${location.port ? ':' + location.port : ''}${location.pathname}`;
       
@@ -168,7 +200,7 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed');
     }
-  }, [config, loadUsers]);
+  }, [config, loadUsers, users, completeLoginFromStoredToken]);
 
   const logout = useCallback(() => {
     const domain = getDomain();

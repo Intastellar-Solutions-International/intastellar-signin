@@ -2,10 +2,5 @@
     "githubPullRequests.ignoredPullRequestBranches": [
         "development"
     ],
-    "postman.settings.dotenv-detection-notification-visibility": false,
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#610504",
-        "titleBar.activeBackground": "#880705",
-        "titleBar.activeForeground": "#FFFBFB"
-    }
+    "postman.settings.dotenv-detection-notification-visibility": false
 }

@@ -146,6 +146,7 @@ function signin(email) {
                 }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
+                    console.log(e.account);
                     const { phone, birthday } = e.account.user[0];
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
@@ -177,6 +178,7 @@ function signin(email) {
                 }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
+                    console.log(e.account);
                     const { phone, birthday } = e.account.user[0];
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
@@ -344,9 +346,7 @@ const Intastellar = {
                         'Content-Type': 'application/json',
                     }
                 }).then(e => e.json()).then(e => {
-
-                    const user = e.user;
-                    const user2 = e.user2;
+                    console.log(e.length);
                     const loginbtn = document.querySelector(".IntastellarSignin");
                     const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                     const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
@@ -384,7 +384,21 @@ const Intastellar = {
                             }
                         }
                     } else {
-
+                        e.forEach(user => {
+                            if(e.length == 1){
+                                if (user) {
+                                    intastellarLogo.classList.add("reverse");
+                                }
+                                if (type == null || type == undefined || type == "") {
+                                    intastellarSignInInfo.innerHTML = "Sign in as " + user.name.first;
+                                    intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
+                                } else if (type == "signup") {
+                                    intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
+                                    intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
+                                }
+                                loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "' alt='user profile image'>";
+                            }
+                        });
                     }
 
                 }).catch(e => {

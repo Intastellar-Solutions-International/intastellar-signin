@@ -16,11 +16,27 @@ export class IntastellarAPI {
           },
         }
       );
-      
-      if (response.status === 200) {
-        return await response.json();
+
+      if (response.status !== 200) {
+        return [];
       }
-      return [];
+
+      const data = (await response.json()) as {
+        user?: IntastellarUser;
+        user2?: IntastellarUser | IntastellarUser[];
+      };
+      const users: IntastellarUser[] = [];
+      if (data?.user) {
+        users.push(data.user);
+      }
+      if (Array.isArray(data?.user2)) {
+        for (const u of data.user2) {
+          if (u) users.push(u);
+        }
+      } else if (data?.user2) {
+        users.push(data.user2);
+      }
+      return users;
     } catch (error) {
       console.error('Error fetching users:', error);
       return [];
