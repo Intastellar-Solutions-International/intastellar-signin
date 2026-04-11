@@ -113,16 +113,29 @@ function useIntastellar(config) {
                     expires = new Date();
                     expires.setFullYear(expires.getFullYear() + 2);
                     setCookie('inta_acc', token, getDomain(), expires);
-                    if (config.loginCallback) {
+                    if (!config.loginCallback) return [3 /*break*/, 3];
+                    try {
                         config.loginCallback(account);
                     }
-                    else if (config.loginUri) {
+                    catch (e) {
+                        console.error('Intastellar loginCallback error:', e);
+                    }
+                    // Must not reject after callback: signin() would fall through and open OAuth popup.
+                    return [4 /*yield*/, loadUsers().catch(function () { })];
+                case 2:
+                    // Must not reject after callback: signin() would fall through and open OAuth popup.
+                    _a.sent();
+                    return [2 /*return*/];
+                case 3:
+                    if (config.loginUri) {
                         hasQuery = window.location.href.includes('?');
                         separator = hasQuery ? '&' : '?';
                         window.location.href = "".concat(window.location.protocol, "//").concat(config.loginUri).concat(separator, "token=").concat(JSON.stringify(account.user));
+                        // Page is unloading — do not await loadUsers() (often rejects / races and would reopen popup).
+                        return [2 /*return*/];
                     }
-                    return [4 /*yield*/, loadUsers()];
-                case 2:
+                    return [4 /*yield*/, loadUsers().catch(function () { })];
+                case 4:
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -140,7 +153,7 @@ function useIntastellar(config) {
                         throw new types_1.IntastellarError('Window object not available');
                     }
                     appToken = getCookie('inta_acc');
-                    if (!(appToken && users.length > 0)) return [3 /*break*/, 4];
+                    if (!appToken) return [3 /*break*/, 4];
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 3, , 4]);
@@ -172,57 +185,62 @@ function useIntastellar(config) {
                             switch (_a.label) {
                                 case 0:
                                     token = event.data;
-                                    if (!(token && typeof token === 'string')) return [3 /*break*/, 5];
+                                    if (!(token && typeof token === 'string')) return [3 /*break*/, 9];
                                     loginWindow_1.postMessage('iframe-token-received', event.origin);
                                     // Clean up event listener immediately
                                     window.removeEventListener('message', messageListener_1);
                                     _a.label = 1;
                                 case 1:
-                                    _a.trys.push([1, 4, , 5]);
+                                    _a.trys.push([1, 8, , 9]);
                                     return [4 /*yield*/, api_1.IntastellarAPI.verifyToken(token)];
                                 case 2:
                                     account = _a.sent();
                                     expires = new Date();
                                     expires.setFullYear(expires.getFullYear() + 2);
                                     setCookie('inta_acc', token, getDomain(), expires);
-                                    // Handle callback or redirect
-                                    if (config.loginCallback) {
+                                    if (!config.loginCallback) return [3 /*break*/, 4];
+                                    try {
                                         config.loginCallback(account);
-                                        // Use setTimeout to ensure callback completes before closing
-                                        setTimeout(function () {
-                                            if (!loginWindow_1.closed) {
-                                                loginWindow_1.close();
-                                            }
-                                        }, 100);
                                     }
-                                    else if (config.loginUri) {
-                                        hasQuery = window.location.href.includes('?');
-                                        separator = hasQuery ? '&' : '?';
-                                        window.location.href = "".concat(window.location.protocol, "//").concat(config.loginUri).concat(separator, "token=").concat(JSON.stringify(account.user));
-                                        // Close window after redirect is initiated
-                                        setTimeout(function () {
-                                            if (!loginWindow_1.closed) {
-                                                loginWindow_1.close();
-                                            }
-                                        }, 100);
+                                    catch (e) {
+                                        console.error('Intastellar loginCallback error:', e);
                                     }
-                                    else {
-                                        // No callback or redirect specified, just close the window
-                                        loginWindow_1.close();
-                                    }
-                                    return [4 /*yield*/, loadUsers()];
+                                    setTimeout(function () {
+                                        if (!loginWindow_1.closed) {
+                                            loginWindow_1.close();
+                                        }
+                                    }, 100);
+                                    return [4 /*yield*/, loadUsers().catch(function () { })];
                                 case 3:
                                     _a.sent();
-                                    return [3 /*break*/, 5];
+                                    return [3 /*break*/, 7];
                                 case 4:
+                                    if (!config.loginUri) return [3 /*break*/, 5];
+                                    hasQuery = window.location.href.includes('?');
+                                    separator = hasQuery ? '&' : '?';
+                                    window.location.href = "".concat(window.location.protocol, "//").concat(config.loginUri).concat(separator, "token=").concat(JSON.stringify(account.user));
+                                    setTimeout(function () {
+                                        if (!loginWindow_1.closed) {
+                                            loginWindow_1.close();
+                                        }
+                                    }, 100);
+                                    return [3 /*break*/, 7];
+                                case 5:
+                                    loginWindow_1.close();
+                                    return [4 /*yield*/, loadUsers().catch(function () { })];
+                                case 6:
+                                    _a.sent();
+                                    _a.label = 7;
+                                case 7: return [3 /*break*/, 9];
+                                case 8:
                                     err_3 = _a.sent();
                                     setError(err_3 instanceof Error ? err_3.message : 'Authentication failed');
                                     // Close window on error too
                                     if (!loginWindow_1.closed) {
                                         loginWindow_1.close();
                                     }
-                                    return [3 /*break*/, 5];
-                                case 5: return [2 /*return*/];
+                                    return [3 /*break*/, 9];
+                                case 9: return [2 /*return*/];
                             }
                         });
                     }); };
@@ -250,7 +268,7 @@ function useIntastellar(config) {
                 case 6: return [2 /*return*/];
             }
         });
-    }); }, [config, loadUsers, users, completeLoginFromStoredToken]);
+    }); }, [config, loadUsers, completeLoginFromStoredToken]);
     var logout = (0, react_1.useCallback)(function () {
         var domain = getDomain();
         if (typeof document !== 'undefined') {

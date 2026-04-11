@@ -70,14 +70,25 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
       setCookie('inta_acc', token, getDomain(), expires);
 
       if (config.loginCallback) {
-        config.loginCallback(account);
-      } else if (config.loginUri) {
+        try {
+          config.loginCallback(account);
+        } catch (e) {
+          console.error('Intastellar loginCallback error:', e);
+        }
+        // Must not reject after callback: signin() would fall through and open OAuth popup.
+        await loadUsers().catch(() => {});
+        return;
+      }
+
+      if (config.loginUri) {
         const hasQuery = window.location.href.includes('?');
         const separator = hasQuery ? '&' : '?';
         window.location.href = `${window.location.protocol}//${config.loginUri}${separator}token=${JSON.stringify(account.user)}`;
+        // Page is unloading — do not await loadUsers() (often rejects / races and would reopen popup).
+        return;
       }
 
-      await loadUsers();
+      await loadUsers().catch(() => {});
     },
     [config, loadUsers]
   );
@@ -90,13 +101,15 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
         throw new IntastellarError('Window object not available');
       }
 
+      // Skip OAuth popup when this origin already has a valid app token (verify is authoritative).
+      // Do not require getuser/`users` state here: getuser can be empty (CORS, parsing, timing) while inta_acc is still valid.
       const appToken = getCookie('inta_acc');
-      if (appToken && users.length > 0) {
+      if (appToken) {
         try {
           await completeLoginFromStoredToken(appToken);
           return;
         } catch {
-          // Stale token or verify failure — fall through to OAuth popup
+          // Invalid or expired token — fall through to OAuth popup
         }
       }
 
@@ -142,29 +155,30 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
             
             // Handle callback or redirect
             if (config.loginCallback) {
-              config.loginCallback(account);
-              // Use setTimeout to ensure callback completes before closing
+              try {
+                config.loginCallback(account);
+              } catch (e) {
+                console.error('Intastellar loginCallback error:', e);
+              }
               setTimeout(() => {
                 if (!loginWindow.closed) {
                   loginWindow.close();
                 }
               }, 100);
+              await loadUsers().catch(() => {});
             } else if (config.loginUri) {
               const hasQuery = window.location.href.includes('?');
               const separator = hasQuery ? '&' : '?';
               window.location.href = `${window.location.protocol}//${config.loginUri}${separator}token=${JSON.stringify(account.user)}`;
-              // Close window after redirect is initiated
               setTimeout(() => {
                 if (!loginWindow.closed) {
                   loginWindow.close();
                 }
               }, 100);
             } else {
-              // No callback or redirect specified, just close the window
               loginWindow.close();
+              await loadUsers().catch(() => {});
             }
-            
-            await loadUsers();
           } catch (err) {
             setError(err instanceof Error ? err.message : 'Authentication failed');
             // Close window on error too
@@ -200,7 +214,7 @@ export function useIntastellar(config: IntastellarConfig): UseIntastellarReturn 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed');
     }
-  }, [config, loadUsers, users, completeLoginFromStoredToken]);
+  }, [config, loadUsers, completeLoginFromStoredToken]);
 
   const logout = useCallback(() => {
     const domain = getDomain();
