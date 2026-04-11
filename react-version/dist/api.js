@@ -43,11 +43,11 @@ var IntastellarAPI = /** @class */ (function () {
     }
     IntastellarAPI.getUsers = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var response, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, data, users, _i, _a, u, error_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a.trys.push([0, 4, , 5]);
+                        _b.trys.push([0, 3, , 4]);
                         return [4 /*yield*/, fetch("".concat(this.baseUrl, "/usercontent/js/getuser?origin=").concat(typeof window !== 'undefined' ? window.location.host : ''), {
                                 method: 'GET',
                                 credentials: 'include',
@@ -57,16 +57,33 @@ var IntastellarAPI = /** @class */ (function () {
                                 },
                             })];
                     case 1:
-                        response = _a.sent();
-                        if (!(response.status === 200)) return [3 /*break*/, 3];
+                        response = _b.sent();
+                        if (response.status !== 200) {
+                            return [2 /*return*/, []];
+                        }
                         return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
-                    case 3: return [2 /*return*/, []];
-                    case 4:
-                        error_1 = _a.sent();
+                    case 2:
+                        data = (_b.sent());
+                        users = [];
+                        if (data === null || data === void 0 ? void 0 : data.user) {
+                            users.push(data.user);
+                        }
+                        if (Array.isArray(data === null || data === void 0 ? void 0 : data.user2)) {
+                            for (_i = 0, _a = data.user2; _i < _a.length; _i++) {
+                                u = _a[_i];
+                                if (u)
+                                    users.push(u);
+                            }
+                        }
+                        else if (data === null || data === void 0 ? void 0 : data.user2) {
+                            users.push(data.user2);
+                        }
+                        return [2 /*return*/, users];
+                    case 3:
+                        error_1 = _b.sent();
                         console.error('Error fetching users:', error_1);
                         return [2 /*return*/, []];
-                    case 5: return [2 /*return*/];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
