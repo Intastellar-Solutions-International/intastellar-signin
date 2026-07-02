@@ -162,6 +162,16 @@ function signin(email) {
                     } else {
                         window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + "?token=" + JSON.stringify(t);
                     }
+
+                    setInterval(function() {
+                        silentReauth(function(account) {
+                            if (account != null) {
+                                console.log("User is still logged in");
+                            } else {
+                                console.log("User is not logged in");
+                            }
+                        });
+                    }, 1000 * 60 * 60 * 1); // 1 hour
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
                 }
@@ -226,6 +236,26 @@ function loginViaToken() {
     }
 }
 
+function silentReauth(callback) {
+    const token = checkToken();
+    if (token != null) {
+        fetch("https://apis.intastellaraccounts.com/verify", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(e => e.json()).then(e => {
+            if (e.statusCode == 200) {
+                callback(e.account);
+            } else {
+                throw new IntastellarSolutionsSDKError(e.error);
+            }
+        }).catch(e => {
+            throw new IntastellarSolutionsSDKError(e.error);
+        })
+    }
+}
 /* Check user loggedin status on intastellaraccounts.com */
 
 const Intastellar = {
