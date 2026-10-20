@@ -32,6 +32,212 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[char]));
+}
+
+function isSecureContext() {
+    return window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+}
+
+function resolveCookieDomain() {
+    // Default to the exact current host. Widening to the parent domain is
+    // opt-in (data-cookie-domain="parent") because doing it unconditionally
+    // is unsafe on multi-tenant public suffixes such as *.github.io or
+    // *.vercel.app, where it would leak the cookie to every other site
+    // hosted on the same parent domain.
+    const widen = document.querySelector("[data-cookie-domain]")?.getAttribute("data-cookie-domain") === "parent";
+    if (!widen) {
+        return null;
+    }
+    let domain = window.location.hostname || window.location.host;
+    const domainParts = domain.split(".");
+    if (domainParts.length > 2) {
+        domainParts.shift();
+    }
+    if (isNaN(domainParts[0])) {
+        domain = domainParts.join(".");
+    }
+    return domain.split(":")[0];
+}
+
+function setCookie(name, value, yearsValid) {
+    const expires = new Date();
+    expires.setFullYear(expires.getFullYear() + yearsValid);
+    const domain = resolveCookieDomain();
+    let cookie = name + "=" + value + "; expires=" + expires.toUTCString() + "; path=/; SameSite=Lax" + (isSecureContext() ? "; Secure" : "");
+    if (domain) {
+        cookie += "; domain=" + domain;
+    }
+    document.cookie = cookie;
+}
+
+function clearCookie(name) {
+    const domain = resolveCookieDomain();
+    let cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax" + (isSecureContext() ? "; Secure" : "");
+    if (domain) {
+        cookie += "; domain=" + domain;
+    }
+    document.cookie = cookie;
+}
+
+// Tracks whether a sign-in attempt is already underway so a second click
+// (or a second render of the widget) can't open a duplicate OAuth popup.
+let signinInProgress = false;
+
+function setSigninButtonsBusy(isBusy) {
+    const popupButton = document.querySelector(".intastellar-popup-button");
+    const triggerButton = document.querySelector(".IntastellarSignin");
+    // Swap the label on the inner text node rather than the button's whole
+    // innerHTML so the logo image inside .IntastellarSignin survives.
+    const triggerLabel = document.querySelector(".intastellarSignIn-info");
+
+    [popupButton, triggerButton].forEach((button) => {
+        if (button == null) {
+            return;
+        }
+        button.disabled = isBusy;
+        if (isBusy) {
+            button.setAttribute("aria-busy", "true");
+        } else {
+            button.removeAttribute("aria-busy");
+        }
+    });
+
+    [popupButton, triggerLabel].forEach((label) => {
+        if (label == null) {
+            return;
+        }
+        if (isBusy) {
+            if (label.dataset.idleLabel == null) {
+                label.dataset.idleLabel = label.innerHTML;
+            }
+            label.innerHTML = "Signing in&hellip;";
+        } else if (label.dataset.idleLabel != null) {
+            label.innerHTML = label.dataset.idleLabel;
+            delete label.dataset.idleLabel;
+        }
+    });
+}
+
+// Remembers what had focus before the panel opened, so closeSignIn() can
+// put it back instead of dropping focus to the document body.
+let lastFocusedBeforePopup = null;
+
+function openSignInPanel() {
+    const shadow = document.querySelector(".intastellar-popup-shadow");
+    const popup = document.querySelector(".intastellar-popup");
+    if (shadow == null || popup == null) {
+        return;
+    }
+    lastFocusedBeforePopup = document.activeElement;
+    shadow.style.visibility = "visible";
+    // Wait a frame before animating position: toggling visibility and a
+    // transform in the same tick can get coalesced into one paint, which
+    // skips the CSS transition entirely (the old code used a hardcoded
+    // 100ms setTimeout for this, which is unreliable on slower devices).
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (window.innerWidth <= 768) {
+            popup.style.bottom = "0";
+        } else if (!popup.classList.contains("top-left")) {
+            popup.style.right = "0";
+        }
+        popup.querySelector(".close-popup")?.focus();
+    }));
+}
+
+function showSigninError(message) {
+    const errorEl = document.querySelector(".intastellar-popup-error");
+    if (errorEl != null) {
+        errorEl.textContent = message;
+        errorEl.hidden = false;
+    }
+    openSignInPanel();
+}
+
+function clearSigninError() {
+    const errorEl = document.querySelector(".intastellar-popup-error");
+    if (errorEl != null) {
+        errorEl.hidden = true;
+        errorEl.textContent = "";
+    }
+}
+
+// Registered once (guarded) no matter how many times renderButton() runs:
+// Escape closes whichever sign-in panel is open, and Tab is trapped inside
+// it while it's open so keyboard focus can't escape to the rest of the page.
+let popupKeyboardHandlingAttached = false;
+function ensurePopupKeyboardHandling() {
+    if (popupKeyboardHandlingAttached) {
+        return;
+    }
+    popupKeyboardHandlingAttached = true;
+    document.addEventListener("keydown", (e) => {
+        const shadow = document.querySelector(".intastellar-popup-shadow");
+        if (shadow == null || shadow.style.visibility !== "visible") {
+            return;
+        }
+
+        if (e.key === "Escape") {
+            closeSignIn();
+            return;
+        }
+
+        if (e.key !== "Tab") {
+            return;
+        }
+
+        const popup = document.querySelector(".intastellar-popup");
+        const focusable = popup?.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (!focusable || focusable.length === 0) {
+            return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    });
+}
+
+function isSameOriginDestination(destination) {
+    // data-login_uri is meant to be a path on this same site. Since it gets
+    // built straight into a full URL and navigated to, anything that
+    // resolves off-origin (a misconfigured attribute, or one templated from
+    // unvalidated input by the integrating site) is an open redirect --
+    // refuse to navigate there instead of silently leaving the site.
+    try {
+        const candidate = new URL(window.location.protocol + "//" + destination);
+        return candidate.origin === window.location.origin;
+    } catch (e) {
+        return false;
+    }
+}
+
+function getCenteredPopupPosition(width, height) {
+    // Account for multi-monitor setups (screenLeft/Top) so the popup is
+    // centered on whichever screen the browser window is actually on,
+    // instead of always opening near the top-left corner.
+    const dualScreenLeft = window.screenLeft ?? window.screenX ?? 0;
+    const dualScreenTop = window.screenTop ?? window.screenY ?? 0;
+    const viewportWidth = window.innerWidth ?? document.documentElement.clientWidth ?? screen.width;
+    const viewportHeight = window.innerHeight ?? document.documentElement.clientHeight ?? screen.height;
+    return {
+        left: Math.max(0, dualScreenLeft + (viewportWidth - width) / 2),
+        top: Math.max(0, dualScreenTop + (viewportHeight - height) / 2),
+    };
+}
+
 function closeSignIn() {
     if (window.innerWidth <= 768) {
         document.querySelector('.intastellar-popup').style.bottom = '-100%';
@@ -41,31 +247,28 @@ function closeSignIn() {
         document.querySelector('.intastellar-popup-shadow').style.visibility = 'hidden'
     }
 
-    // Get root domain or the ip address if domain is not available
-    let domain = window.location.hostname || window.location.host;
-    // Remove the subdomain from the domain name and check if it's an ip address
-    const domainParts = domain.split(".");
-    if (domainParts.length > 2) {
-        domainParts.shift();
-    }
-    if (isNaN(domainParts[0])) {
-        domain = domainParts.join(".");
-    }
+    setCookie("inta_state", "1", 2);
 
-    // Add the port if it´s on the origin domain
-    if (window.location.port != "") {
-        domain += ":" + window.location.port;
+    // Return focus to whatever triggered the panel instead of dropping it
+    // back to the document body.
+    if (lastFocusedBeforePopup != null && typeof lastFocusedBeforePopup.focus === "function") {
+        lastFocusedBeforePopup.focus();
+        lastFocusedBeforePopup = null;
     }
-    const expires = new Date();
-    // Set the expiration date to 2 years
-    expires.setFullYear(expires.getFullYear() + 2);
-    domain = domain.split(":")[0];
-
-    document.cookie = "inta_state=1; expires=" + expires.toUTCString() + "; domain=" + domain + "; path=/";
 }
 
 function signin(email) {
+    // Ignore a second click while a sign-in attempt is already in flight
+    // instead of opening a duplicate OAuth popup.
+    if (signinInProgress) {
+        return;
+    }
+    signinInProgress = true;
+    setSigninButtonsBusy(true);
+    clearSigninError();
+
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
+    const intastellarAccountsOrigin = "https://www.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
     const appName = document.querySelector("[data-app-name]")?.getAttribute("data-app-name");
     const key = document.querySelector("[data-client_id]")?.getAttribute("data-client_id");
@@ -87,16 +290,32 @@ function signin(email) {
         domain += ":" + window.location.port;
     }
 
-    let loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    const popupWidth = 500;
+    const popupHeight = 719;
+    const popupPosition = getCenteredPopupPosition(popupWidth, popupHeight);
+    const popupFeatures = "height=" + popupHeight + ",width=" + popupWidth + ",left=" + popupPosition.left + ",top=" + popupPosition.top + ",resizable=no";
+
+    // A per-attempt random value sent as the OAuth `state` param. This is
+    // the standard CSRF-defense mechanism for the authorization request
+    // itself; note the accounts service doesn't currently echo state back
+    // through postMessage, so it can't yet be verified round-trip here --
+    // the message channel's actual CSRF protection is the origin check in
+    // onMessage() below. Sending it now means nothing has to change here if
+    // the backend adds that round trip later.
+    const signinState = (window.crypto?.randomUUID?.() || (Date.now() + "-" + Math.random().toString(36).slice(2)));
+
+    let loginWindow = window.open(intastellarAccountsOrigin + "/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope + "&state=" + signinState, 'popUpWindow', popupFeatures);
     if (email != null) {
-        loginWindow = window.open("https://www.intastellaraccounts.com/signin/v2/ws/oauth/pwd?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&identifier=" + email + "&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+        loginWindow = window.open(intastellarAccountsOrigin + "/signin/v2/ws/oauth/pwd?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&identifier=" + email + "&scope=" + scope + "&state=" + signinState, 'popUpWindow', popupFeatures);
 
     }
 
 
     if (loginWindow == null) {
+        signinInProgress = false;
+        setSigninButtonsBusy(false);
+        showSigninError("Please enable popups for this website and try again.");
         throw new IntastellarSolutionsSDKError("Please enable popups for this website");
-        return;
     }
 
     const checkLoadedAndClosed = setInterval(function () {
@@ -111,18 +330,26 @@ function signin(email) {
         }
         // Check if the window is closed
         if (loginWindow.closed) {
-            // If the window is closed
-
+            // If the window is closed, stop polling and drop the message
+            // listener so closing the popup without finishing login doesn't
+            // leak a listener (and so a stale popup can't deliver a message
+            // after the user has moved on).
             clearInterval(checkLoadedAndClosed);
+            window.removeEventListener("message", onMessage);
+            signinInProgress = false;
+            setSigninButtonsBusy(false);
         }
     }, 1000);
 
-    window.addEventListener("message", function (token) {
+    function onMessage(token) {
+        // Only trust messages from the Intastellar accounts service. Without
+        // this check, any page on the web could postMessage a forged token
+        // to this window and be treated as a successful login.
+        if (token.origin !== intastellarAccountsOrigin) {
+            return;
+        }
+
         const t = token.data;
-        const expires = new Date();
-        // Set the expiration date to 2 years
-        expires.setFullYear(expires.getFullYear() + 2);
-        domain = domain.split(":")[0];
 
         if (t != "") {
             loginWindow.postMessage("iframe-token-recieved", token.origin);
@@ -130,15 +357,15 @@ function signin(email) {
 
         if (document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null) {
             new IntastellarSolutionsSDKError("Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
+            signinInProgress = false;
+            setSigninButtonsBusy(false);
             return;
         }
 
         if (document.querySelector("[data-login_uri]") != null) {
-            // Check if current url has a query string
-            const query = "?" + window.location.href.split("?")[1];
             const token = t;
 
-            fetch("https://apis.intastellaraccounts.com/verify", {
+            fetch(intastellarIssuerUrl + "/verify", {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,31 +373,57 @@ function signin(email) {
                 }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
-                    console.log(e.account);
                     const { phone, birthday } = e.account.user[0];
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
                     delete e.account.user[0];
-                    const t = e.account;
+                    const account = e.account;
                     const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
                     console.log(success.getCustomSuccessMessage());
-                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + "; path=/";
+                    setCookie("inta_acc", token, 2);
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
-                    if (window.location.href.indexOf("?") > -1) {
-                        const query = "?" + window.location.href.split("?")[1];
-                        // Add the query string to the url
-                        window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + query + "&token=" + JSON.stringify(t);
-                    } else {
-                        window.location.href = window.location.protocol + "//" + document.querySelector("[data-login_uri]").getAttribute("data-login_uri") + "?token=" + JSON.stringify(t);
+
+                    // Hand the account payload off via a one-time sessionStorage
+                    // entry instead of embedding the token/profile in the URL,
+                    // where it would end up in browser history and server logs.
+                    // The destination page retrieves it with
+                    // Intastellar.accounts.id.consumeToken(ref).
+                    const tokenRef = (window.crypto?.randomUUID?.() || (Date.now() + "-" + Math.random().toString(36).slice(2)));
+                    sessionStorage.setItem("intastellar_pending_" + tokenRef, JSON.stringify(account));
+
+                    const destination = document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
+                    if (!isSameOriginDestination(destination)) {
+                        sessionStorage.removeItem("intastellar_pending_" + tokenRef);
+                        signinInProgress = false;
+                        setSigninButtonsBusy(false);
+                        showSigninError("Sign-in is misconfigured for this site (invalid redirect target).");
+                        return;
                     }
+                    const existingQuery = window.location.href.indexOf("?") > -1 ? "?" + window.location.href.split("?")[1] + "&" : "?";
+                    window.location.href = window.location.protocol + "//" + destination + existingQuery + "intastellar_token_ref=" + tokenRef;
+                    window.removeEventListener("message", onMessage);
+
+                    setInterval(function() {
+                        silentReauth(function(account) {
+                            if (account != null) {
+                                console.log("User is still logged in");
+                            } else {
+                                console.log("User is not logged in");
+                            }
+                        });
+                    }, 1000 * 60 * 60 * 1); // 1 hour
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
                 }
+            }).catch(() => {
+                signinInProgress = false;
+                setSigninButtonsBusy(false);
+                showSigninError("We couldn't sign you in. Please try again.");
             })
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
             const token = t;
-            fetch("https://apis.intastellaraccounts.com/verify", {
+            fetch(intastellarIssuerUrl + "/verify", {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -178,7 +431,6 @@ function signin(email) {
                 }
             }).then(e => e.json()).then(e => {
                 if (e.statusCode == 200) {
-                    console.log(e.account);
                     const { phone, birthday } = e.account.user[0];
                     e.account.user.phone = phone;
                     e.account.user.birthday = birthday;
@@ -186,16 +438,32 @@ function signin(email) {
                     const success = new IntastellarSolutionsSDKSuccess("We´ve successfully send user data for: " + e.account.user.name.first);
                     console.log(success.getCustomSuccessMessage());
 
-                    document.cookie = "inta_acc=" + token + ";expire=" + expires + "; domain=" + domain + "; path=/";
+                    setCookie("inta_acc", token, 2);
 
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     fn(e.account);
+                    window.removeEventListener("message", onMessage);
+                    signinInProgress = false;
+                    setSigninButtonsBusy(false);
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
                 }
+            }).catch(() => {
+                signinInProgress = false;
+                setSigninButtonsBusy(false);
+                showSigninError("We couldn't sign you in. Please try again.");
             })
+        } else {
+            // Neither data-login_uri nor data-login_callback is configured, so
+            // there's nowhere to deliver the result. Reset the UI instead of
+            // leaving the button stuck showing "Signing in..." forever.
+            signinInProgress = false;
+            setSigninButtonsBusy(false);
+            showSigninError("Sign-in is misconfigured for this site. Please contact the site owner.");
         }
-    })
+    }
+
+    window.addEventListener("message", onMessage);
 }
 
 function checkToken() {
@@ -228,6 +496,26 @@ function loginViaToken() {
     }
 }
 
+function silentReauth(callback) {
+    const token = checkToken();
+    if (token != null) {
+        fetch("https://apis.intastellaraccounts.com/verify", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(e => e.json()).then(e => {
+            if (e.statusCode == 200) {
+                callback(e.account);
+            } else {
+                throw new IntastellarSolutionsSDKError(e.error);
+            }
+        }).catch(e => {
+            throw new IntastellarSolutionsSDKError(e.error);
+        })
+    }
+}
 /* Check user loggedin status on intastellaraccounts.com */
 
 const Intastellar = {
@@ -251,7 +539,18 @@ const Intastellar = {
                 const IntastellarText = document.createElement("div");
                 const intastellarPopup = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
-                if (type == null || type == undefined || type == "" || type == "intastellar") {
+                // If a session cookie is already present, the getuser fetch
+                // below is about to rewrite this label to "Sign in as X" --
+                // show a neutral skeleton instead of flashing the signed-out
+                // label first and immediately overwriting it (only matters
+                // for the "popup" picker, since that's the only mode that
+                // ever rewrites this label at all).
+                const hasExistingSession = theme.picker == "popup" && getCookie("inta_acc") != null;
+                if (hasExistingSession) {
+                    IntastellarText.innerHTML = '<span class="intastellar-skeleton" aria-hidden="true"></span>';
+                    IntastellarSigninButton.classList.add("intastellar-loading");
+                    IntastellarSigninButton.setAttribute("aria-busy", "true");
+                } else if (type == null || type == undefined || type == "" || type == "intastellar") {
                     IntastellarText.innerHTML = "Sign in with Intastellar"
                 } else if (type == "signup") {
                     IntastellarText.innerHTML = "Sign up with Intastellar"
@@ -259,12 +558,23 @@ const Intastellar = {
 
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
                 intastellarPopup.setAttribute("class", "intastellar-popup");
-                if (theme != null || theme != undefined) {
-                    if (theme.theme == "dark") {
-                        IntastellarSigninButton.classList.add("dark");
-                        intastellarPopup.classList.add("dark");
-                    }
 
+                // Default to the OS/browser color scheme when the integrator
+                // hasn't set an explicit theme, instead of always defaulting
+                // to light and clashing with a dark page.
+                const prefersDarkScheme = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+                if (theme?.theme === "dark" || (theme?.theme == null && prefersDarkScheme)) {
+                    IntastellarSigninButton.classList.add("dark");
+                    intastellarPopup.classList.add("dark");
+                }
+                if (theme?.theme == null && window.matchMedia) {
+                    window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", (e) => {
+                        IntastellarSigninButton.classList.toggle("dark", e.matches);
+                        intastellarPopup.classList.toggle("dark", e.matches);
+                    });
+                }
+
+                if (theme != null || theme != undefined) {
                     if (theme.scopes != null || theme.scopes != undefined) {
                         IntastellarSigninButton.setAttribute("data-scope", theme.scopes);
                     }
@@ -289,8 +599,16 @@ const Intastellar = {
 
                 const intastellarPopupShadow = document.createElement("div");
                 intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
-                /* intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'"); */
+                // Close when the backdrop itself is clicked, but not when a
+                // click inside the popup bubbles up to it.
+                intastellarPopupShadow.addEventListener("click", (e) => {
+                    if (e.target === intastellarPopupShadow) {
+                        closeSignIn();
+                    }
+                });
                 intastellarPopupShadow.appendChild(intastellarPopup);
+                intastellarPopup.setAttribute("tabindex", "-1");
+                ensurePopupKeyboardHandling();
 
                 if (getCookie("inta_acc") != null) {
                     intastellarPopupShadow.setAttribute("style", "visibility: hidden");
@@ -306,15 +624,18 @@ const Intastellar = {
                 intastellarPopupContent.setAttribute("class", "intastellar-popup-content");
                 intastellarPopup.innerHTML = `<header class="mobile-header desktop-hide">
                             <img src="${intastellarLogoSrc}" class="logo" alt="Intastellar logo">
-                            <p class="header-info">Sign into ${appName} with Intastellar</p>
-                            <button class="close-popup" onclick="closeSignIn()">
+                            <p class="header-info">Sign into ${escapeHtml(appName)} with Intastellar</p>
+                            <button class="close-popup">
                                 <svg class="Bz112c Bz112c-r9oPif" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path><path fill="none" d="M0 0h24v24H0z"></path></svg>
                             </button>
                         </header>`;
+                intastellarPopup.querySelector(".close-popup").addEventListener("click", closeSignIn);
+
+                intastellarPopupContent.innerHTML += `<p class="intastellar-popup-error" role="alert" hidden></p>`;
 
                 intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
                     <section>
-                        <p class="intastellarSignIn-title">Sign into '${appName}' with your Intastellar Account</p>
+                        <p class="intastellarSignIn-title">Sign into '${escapeHtml(appName)}' with your Intastellar Account</p>
                         <p class="intastellarSignIn-info">
                             You no longer need to remember your passwords. Logging in is quick, easy and secure.
                         </p>
@@ -327,10 +648,14 @@ const Intastellar = {
                 const intastellarPopupButton = document.createElement("button");
                 intastellarPopupButton.innerHTML = "Continue with Intastellar";
                 intastellarPopupButton.setAttribute("class", "intastellar-popup-button");
-                intastellarPopupButton.setAttribute("onclick", "signin()");
+                // Assigned as a real function reference (not via setAttribute
+                // with a string) so it can be safely overwritten below without
+                // risking HTML-attribute injection and without stacking a
+                // second listener on top of this default handler.
+                intastellarPopupButton.onclick = () => signin();
 
                 intastellarPopupContent.appendChild(intastellarPopupButton);
-                intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + appName + ".</p>";
+                intastellarPopupContent.innerHTML += "<p class='intastellar-popup-footer'>To create your account, Intastellar will share your name, email and profile picture with " + escapeHtml(appName) + ".</p>";
                 intastellarPopup.appendChild(intastellarPopupContent);
                 document.body.appendChild(intastellarPopupShadow);
                 if (getCookie("inta_state") == "1" && theme.picker == "popup") {
@@ -346,105 +671,152 @@ const Intastellar = {
                         'Content-Type': 'application/json',
                     }
                 }).then(e => e.json()).then(e => {
-                    console.log(e.length);
+                    const user = e.user;
+                    const user2 = e.user2;
                     const loginbtn = document.querySelector(".IntastellarSignin");
                     const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                     const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
                     const intastellarLogo = document.querySelector(".intastellar-logo");
+                    // loginbtn is null in "popup" picker mode: .IntastellarSignin
+                    // is never appended to the DOM there (there's no separate
+                    // trigger button -- the popup panel itself is the UI), so
+                    // this must stay guarded or it throws on every render in
+                    // that mode and silently kills the rest of this callback
+                    // via the .catch() below.
+                    if (loginbtn != null && loginbtn.classList.contains("intastellar-loading")) {
+                        loginbtn.classList.remove("intastellar-loading");
+                        loginbtn.removeAttribute("aria-busy");
+                        if (!user) {
+                            // The session cookie existed but the server says
+                            // we're not actually logged in (e.g. expired) --
+                            // fall back to the normal signed-out label instead
+                            // of leaving the skeleton markup in place.
+                            intastellarSignInInfo.innerHTML = (type == "signup") ? "Sign up with Intastellar" : "Sign in with Intastellar";
+                        }
+                    }
                     if (theme.picker == "popup") {
                         if (window.innerWidth > 768) {
-                            if (user) {
+                            // intastellarLogo is also null in "popup" mode for
+                            // the same reason as loginbtn above.
+                            if (user && intastellarLogo != null) {
                                 intastellarLogo.classList.add("reverse");
                             }
                             if (type == null || type == undefined || type == "") {
-                                intastellarSignInInfo.innerHTML = "Sign in as " + user.name.first;
-                                intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
+                                intastellarSignInInfo.innerHTML = "Sign in as " + escapeHtml(user.name.first);
+                                intastellarSignInInfo.innerHTML += "<span class='email'>" + escapeHtml(user.email) + "</span>";
                             } else if (type == "signup") {
-                                intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
-                                intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
+                                intastellarSignInInfo.innerHTML = "Sign up as " + escapeHtml(user.name.first);
+                                intastellarSignInInfo.innerHTML += "<span class='email'>" + escapeHtml(user.email) + "</span>";
                             }
-                            loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "' alt='user profile image'>";
+                            if (loginbtn != null) {
+                                loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + escapeHtml(user.image) + "' alt='user profile image'>";
+                            }
                         } else {
 
                             if (user && user2.length == 0) {
-                                document.querySelector(".intastellar-popup-button").setAttribute("onclick", "signin('" + user.email + "')");
+                                // Replace the default handler with a real function
+                                // reference instead of splicing the user's email into an
+                                // inline onclick string: an email containing a quote
+                                // would otherwise break out of the attribute and inject
+                                // arbitrary script.
+                                document.querySelector(".intastellar-popup-button").onclick = () => signin(user.email);
                             }
 
                             if (user) {
-                                document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${user.image}" class="intastellar-popup-userProfile" alt="user profile image"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user.name.first}</p> <p class="intastellar-popup-header-email">${user.email}</p></div>`;
-                                document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + user.name.first;
+                                document.querySelector(".intastellar-popup-header").innerHTML = `<img src="${escapeHtml(user.image)}" class="intastellar-popup-userProfile" alt="user profile image"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${escapeHtml(user.name.first)}</p> <p class="intastellar-popup-header-email">${escapeHtml(user.email)}</p></div>`;
+                                document.querySelector(".intastellar-popup-button").innerHTML = "Continue as " + escapeHtml(user.name.first);
                             }
 
                             if (user2) {
-                                document.querySelector(".intastellar-popup-user").innerHTML = `<img src="${user2.image}" class="intastellar-popup-userProfile" alt="user profile image"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${user2.name.first}</p> <p class="intastellar-popup-header-email">${user2.email}</p></div>`;
+                                document.querySelector(".intastellar-popup-user").innerHTML = `<img src="${escapeHtml(user2.image)}" class="intastellar-popup-userProfile" alt="user profile image"><div class="intastellar-popup-header-info"><p class="intastellar-popup-userName">${escapeHtml(user2.name.first)}</p> <p class="intastellar-popup-header-email">${escapeHtml(user2.email)}</p></div>`;
                             }
 
                             if (user && user2) {
                                 document.querySelector(".intastellar-popup-button").innerHTML = "Continue by choosing an account";
                             }
                         }
-                    } else {
-                        e.forEach(user => {
-                            if(e.length == 1){
-                                if (user) {
-                                    intastellarLogo.classList.add("reverse");
-                                }
-                                if (type == null || type == undefined || type == "") {
-                                    intastellarSignInInfo.innerHTML = "Sign in as " + user.name.first;
-                                    intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
-                                } else if (type == "signup") {
-                                    intastellarSignInInfo.innerHTML = "Sign up as " + user.name.first;
-                                    intastellarSignInInfo.innerHTML += "<span class='email'>" + user.email + "</span>";
-                                }
-                                loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + user.image + "' alt='user profile image'>";
-                            }
-                        });
+                    } else if (user != null && user2 == null) {
+                        // Personalize the plain trigger button too when
+                        // there's exactly one known signed-in account.
+                        intastellarLogo.classList.add("reverse");
+                        if (type == null || type == undefined || type == "") {
+                            intastellarSignInInfo.innerHTML = "Sign in as " + escapeHtml(user.name.first);
+                            intastellarSignInInfo.innerHTML += "<span class='email'>" + escapeHtml(user.email) + "</span>";
+                        } else if (type == "signup") {
+                            intastellarSignInInfo.innerHTML = "Sign up as " + escapeHtml(user.name.first);
+                            intastellarSignInInfo.innerHTML += "<span class='email'>" + escapeHtml(user.email) + "</span>";
+                        }
+                        loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + escapeHtml(user.image) + "' alt='user profile image'>";
                     }
 
-                }).catch(e => {
+                }).catch(() => {
                     new IntastellarSolutionsSDKError("User not logged in");
+                    const loginbtn = document.querySelector(".IntastellarSignin");
+                    if (loginbtn != null && loginbtn.classList.contains("intastellar-loading")) {
+                        loginbtn.classList.remove("intastellar-loading");
+                        loginbtn.removeAttribute("aria-busy");
+                        const label = document.querySelector(".intastellarSignIn-info");
+                        if (label != null) {
+                            label.innerHTML = (type == "signup") ? "Sign up with Intastellar" : "Sign in with Intastellar";
+                        }
+                    }
                 })
 
-                if (IntastellarButtonContainer != null || IntastellarButtonContainer != undefined) {
-                    if (theme.picker != "popup") {
+                if (theme.picker != "popup") {
+                    // Only this branch actually needs the container element;
+                    // the "popup" mode below doesn't put anything into it, so
+                    // it must not be gated on the container existing too --
+                    // that previously meant a missing/mistyped element id
+                    // silently disabled the auto-opening popup entirely.
+                    if (IntastellarButtonContainer != null) {
                         IntastellarButtonContainer.appendChild(IntastellarSigninButton);
                         IntastellarSigninButton.addEventListener("click", (e) => {
                             e.preventDefault();
                             if (window.innerWidth > 768) {
                                 signin();
                             } else {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                                setTimeout(() => {
-                                    document.querySelector(".intastellar-popup").style.bottom = "0";
-                                }, 100);
+                                openSignInPanel();
                             }
                         })
+                    }
+                } else {
+                    if (getCookie("inta_acc") == null && getCookie("inta_state") != "1") {
+                        openSignInPanel();
                     } else {
-                        if (getCookie("inta_acc") == null) {
-                            if (getCookie("inta_state") != "1" && theme.picker == "popup") {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                            }
+                        // Make the hidden state explicit via inline style
+                        // instead of leaning on the .top-left CSS rule's
+                        // default visibility -- that default is correct, but
+                        // depending on stylesheet load timing/specificity
+                        // for a security/UX-relevant show-or-hide decision is
+                        // fragile. This way the two cookie checks above are
+                        // the single source of truth either way.
+                        const shadow = document.querySelector(".intastellar-popup-shadow");
+                        if (shadow != null) {
+                            shadow.style.visibility = "hidden";
                         }
                     }
                 }
             },
             logout() {
-                // Get root domain or the ip address if domain is not available
-                let domain = window.location.hostname || window.location.host;
-                // Remove the subdomain from the domain name and check if it's an ip address
-                const domainParts = domain.split(".");
-                if (domainParts.length > 2) {
-                    domainParts.shift();
+                clearCookie("inta_acc");
+            },
+            // Retrieves (and discards) the one-time account payload stashed by
+            // signin() when using data-login_uri, keyed by the
+            // intastellar_token_ref query parameter the destination page was
+            // redirected with. Returns null if the reference is missing or
+            // already consumed (it's sessionStorage, so it also disappears
+            // once the tab closes).
+            consumeToken(ref) {
+                if (ref == null) {
+                    return null;
                 }
-                if (isNaN(domainParts[0])) {
-                    domain = domainParts.join(".");
+                const key = "intastellar_pending_" + ref;
+                const raw = sessionStorage.getItem(key);
+                if (raw == null) {
+                    return null;
                 }
-
-                // Add the port if it´s on the origin domain
-                if (window.location.port != "") {
-                    domain += ":" + window.location.port;
-                }
-                document.cookie = "inta_acc=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + domain + ";";
+                sessionStorage.removeItem(key);
+                return JSON.parse(raw);
             },
         }
     }
