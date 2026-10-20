@@ -236,6 +236,68 @@
     background-color: rgb(154, 133, 80);
 }
 
+.IntastellarSignin:disabled,
+.intastellar-popup-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.intastellar-popup-button:disabled:hover {
+    background-color: rgb(192, 159, 83);
+}
+
+.intastellar-popup-error {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #9a3b3b;
+    background-color: #fbe9e9;
+    border: 1px solid #f1c3c3;
+    border-radius: 5px;
+}
+
+.dark .intastellar-popup-error {
+    color: #f5b8b8;
+    background-color: #3a2323;
+    border-color: #5c3333;
+}
+
+.intastellar-skeleton {
+    display: inline-block;
+    width: 110px;
+    height: 12px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #e6e6e6 25%, #f2f2f2 37%, #e6e6e6 63%);
+    background-size: 400% 100%;
+    animation: intastellar-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.dark .intastellar-skeleton {
+    background: linear-gradient(90deg, #3a3a3a 25%, #4a4a4a 37%, #3a3a3a 63%);
+    background-size: 400% 100%;
+}
+
+@keyframes intastellar-skeleton-pulse {
+    0% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .intastellar-popup,
+    .close-popup,
+    .IntastellarSignin,
+    .intastellar-skeleton {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
 .intastellar-popup-footer {
     font-size: 12px;
     padding: 10px;

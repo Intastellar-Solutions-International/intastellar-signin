@@ -87,6 +87,157 @@ function clearCookie(name) {
     document.cookie = cookie;
 }
 
+// Tracks whether a sign-in attempt is already underway so a second click
+// (or a second render of the widget) can't open a duplicate OAuth popup.
+let signinInProgress = false;
+
+function setSigninButtonsBusy(isBusy) {
+    const popupButton = document.querySelector(".intastellar-popup-button");
+    const triggerButton = document.querySelector(".IntastellarSignin");
+    // Swap the label on the inner text node rather than the button's whole
+    // innerHTML so the logo image inside .IntastellarSignin survives.
+    const triggerLabel = document.querySelector(".intastellarSignIn-info");
+
+    [popupButton, triggerButton].forEach((button) => {
+        if (button == null) {
+            return;
+        }
+        button.disabled = isBusy;
+        if (isBusy) {
+            button.setAttribute("aria-busy", "true");
+        } else {
+            button.removeAttribute("aria-busy");
+        }
+    });
+
+    [popupButton, triggerLabel].forEach((label) => {
+        if (label == null) {
+            return;
+        }
+        if (isBusy) {
+            if (label.dataset.idleLabel == null) {
+                label.dataset.idleLabel = label.innerHTML;
+            }
+            label.innerHTML = "Signing in&hellip;";
+        } else if (label.dataset.idleLabel != null) {
+            label.innerHTML = label.dataset.idleLabel;
+            delete label.dataset.idleLabel;
+        }
+    });
+}
+
+// Remembers what had focus before the panel opened, so closeSignIn() can
+// put it back instead of dropping focus to the document body.
+let lastFocusedBeforePopup = null;
+
+function openSignInPanel() {
+    const shadow = document.querySelector(".intastellar-popup-shadow");
+    const popup = document.querySelector(".intastellar-popup");
+    if (shadow == null || popup == null) {
+        return;
+    }
+    lastFocusedBeforePopup = document.activeElement;
+    shadow.style.visibility = "visible";
+    // Wait a frame before animating position: toggling visibility and a
+    // transform in the same tick can get coalesced into one paint, which
+    // skips the CSS transition entirely (the old code used a hardcoded
+    // 100ms setTimeout for this, which is unreliable on slower devices).
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (window.innerWidth <= 768) {
+            popup.style.bottom = "0";
+        } else if (!popup.classList.contains("top-left")) {
+            popup.style.right = "0";
+        }
+        popup.querySelector(".close-popup")?.focus();
+    }));
+}
+
+function showSigninError(message) {
+    const errorEl = document.querySelector(".intastellar-popup-error");
+    if (errorEl != null) {
+        errorEl.textContent = message;
+        errorEl.hidden = false;
+    }
+    openSignInPanel();
+}
+
+function clearSigninError() {
+    const errorEl = document.querySelector(".intastellar-popup-error");
+    if (errorEl != null) {
+        errorEl.hidden = true;
+        errorEl.textContent = "";
+    }
+}
+
+// Registered once (guarded) no matter how many times renderButton() runs:
+// Escape closes whichever sign-in panel is open, and Tab is trapped inside
+// it while it's open so keyboard focus can't escape to the rest of the page.
+let popupKeyboardHandlingAttached = false;
+function ensurePopupKeyboardHandling() {
+    if (popupKeyboardHandlingAttached) {
+        return;
+    }
+    popupKeyboardHandlingAttached = true;
+    document.addEventListener("keydown", (e) => {
+        const shadow = document.querySelector(".intastellar-popup-shadow");
+        if (shadow == null || shadow.style.visibility !== "visible") {
+            return;
+        }
+
+        if (e.key === "Escape") {
+            closeSignIn();
+            return;
+        }
+
+        if (e.key !== "Tab") {
+            return;
+        }
+
+        const popup = document.querySelector(".intastellar-popup");
+        const focusable = popup?.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (!focusable || focusable.length === 0) {
+            return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    });
+}
+
+function isSameOriginDestination(destination) {
+    // data-login_uri is meant to be a path on this same site. Since it gets
+    // built straight into a full URL and navigated to, anything that
+    // resolves off-origin (a misconfigured attribute, or one templated from
+    // unvalidated input by the integrating site) is an open redirect --
+    // refuse to navigate there instead of silently leaving the site.
+    try {
+        const candidate = new URL(window.location.protocol + "//" + destination);
+        return candidate.origin === window.location.origin;
+    } catch (e) {
+        return false;
+    }
+}
+
+function getCenteredPopupPosition(width, height) {
+    // Account for multi-monitor setups (screenLeft/Top) so the popup is
+    // centered on whichever screen the browser window is actually on,
+    // instead of always opening near the top-left corner.
+    const dualScreenLeft = window.screenLeft ?? window.screenX ?? 0;
+    const dualScreenTop = window.screenTop ?? window.screenY ?? 0;
+    const viewportWidth = window.innerWidth ?? document.documentElement.clientWidth ?? screen.width;
+    const viewportHeight = window.innerHeight ?? document.documentElement.clientHeight ?? screen.height;
+    return {
+        left: Math.max(0, dualScreenLeft + (viewportWidth - width) / 2),
+        top: Math.max(0, dualScreenTop + (viewportHeight - height) / 2),
+    };
+}
+
 function closeSignIn() {
     if (window.innerWidth <= 768) {
         document.querySelector('.intastellar-popup').style.bottom = '-100%';
@@ -97,9 +248,25 @@ function closeSignIn() {
     }
 
     setCookie("inta_state", "1", 2);
+
+    // Return focus to whatever triggered the panel instead of dropping it
+    // back to the document body.
+    if (lastFocusedBeforePopup != null && typeof lastFocusedBeforePopup.focus === "function") {
+        lastFocusedBeforePopup.focus();
+        lastFocusedBeforePopup = null;
+    }
 }
 
 function signin(email) {
+    // Ignore a second click while a sign-in attempt is already in flight
+    // instead of opening a duplicate OAuth popup.
+    if (signinInProgress) {
+        return;
+    }
+    signinInProgress = true;
+    setSigninButtonsBusy(true);
+    clearSigninError();
+
     const intastellarIssuerUrl = "https://apis.intastellaraccounts.com";
     const intastellarAccountsOrigin = "https://www.intastellaraccounts.com";
     const loginUri = (document.querySelector("[data-login_uri]") == null) ? location.hostname + ((location.port) ? ":" + location.port : "") + location.pathname : document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
@@ -123,14 +290,31 @@ function signin(email) {
         domain += ":" + window.location.port;
     }
 
-    let loginWindow = window.open(intastellarAccountsOrigin + "/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+    const popupWidth = 500;
+    const popupHeight = 719;
+    const popupPosition = getCenteredPopupPosition(popupWidth, popupHeight);
+    const popupFeatures = "height=" + popupHeight + ",width=" + popupWidth + ",left=" + popupPosition.left + ",top=" + popupPosition.top + ",resizable=no";
+
+    // A per-attempt random value sent as the OAuth `state` param. This is
+    // the standard CSRF-defense mechanism for the authorization request
+    // itself; note the accounts service doesn't currently echo state back
+    // through postMessage, so it can't yet be verified round-trip here --
+    // the message channel's actual CSRF protection is the origin check in
+    // onMessage() below. Sending it now means nothing has to change here if
+    // the backend adds that round trip later.
+    const signinState = (window.crypto?.randomUUID?.() || (Date.now() + "-" + Math.random().toString(36).slice(2)));
+
+    let loginWindow = window.open(intastellarAccountsOrigin + "/signin/v2/ws/oauth/oauthchooser?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&scope=" + scope + "&state=" + signinState, 'popUpWindow', popupFeatures);
     if (email != null) {
-        loginWindow = window.open(intastellarAccountsOrigin + "/signin/v2/ws/oauth/pwd?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&identifier=" + email + "&scope=" + scope, 'popUpWindow', 'height=719,width=500,left=100,top=100,resizable=no');
+        loginWindow = window.open(intastellarAccountsOrigin + "/signin/v2/ws/oauth/pwd?service=" + appName + "&continue=" + loginUri + "&entryFlow=" + window.btoa(scope) + "&key=" + key + "&access_id=" + encodeURI(domain) + "&passive=true&flowName=GeneralOAuthFlow&Entry=webauthsignin&identifier=" + email + "&scope=" + scope + "&state=" + signinState, 'popUpWindow', popupFeatures);
 
     }
 
 
     if (loginWindow == null) {
+        signinInProgress = false;
+        setSigninButtonsBusy(false);
+        showSigninError("Please enable popups for this website and try again.");
         throw new IntastellarSolutionsSDKError("Please enable popups for this website");
     }
 
@@ -152,6 +336,8 @@ function signin(email) {
             // after the user has moved on).
             clearInterval(checkLoadedAndClosed);
             window.removeEventListener("message", onMessage);
+            signinInProgress = false;
+            setSigninButtonsBusy(false);
         }
     }, 1000);
 
@@ -171,6 +357,8 @@ function signin(email) {
 
         if (document.querySelector("[data-login_uri]") != null && document.querySelector("[data-login_callback]") != null) {
             new IntastellarSolutionsSDKError("Please add only 1 of the following: data-login_callback or data-login_uri. Not both")
+            signinInProgress = false;
+            setSigninButtonsBusy(false);
             return;
         }
 
@@ -204,6 +392,13 @@ function signin(email) {
                     sessionStorage.setItem("intastellar_pending_" + tokenRef, JSON.stringify(account));
 
                     const destination = document.querySelector("[data-login_uri]").getAttribute("data-login_uri");
+                    if (!isSameOriginDestination(destination)) {
+                        sessionStorage.removeItem("intastellar_pending_" + tokenRef);
+                        signinInProgress = false;
+                        setSigninButtonsBusy(false);
+                        showSigninError("Sign-in is misconfigured for this site (invalid redirect target).");
+                        return;
+                    }
                     const existingQuery = window.location.href.indexOf("?") > -1 ? "?" + window.location.href.split("?")[1] + "&" : "?";
                     window.location.href = window.location.protocol + "//" + destination + existingQuery + "intastellar_token_ref=" + tokenRef;
                     window.removeEventListener("message", onMessage);
@@ -220,6 +415,10 @@ function signin(email) {
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
                 }
+            }).catch(() => {
+                signinInProgress = false;
+                setSigninButtonsBusy(false);
+                showSigninError("We couldn't sign you in. Please try again.");
             })
         } else if (document.querySelector("[data-login_callback]") != null) {
             const fn = window[document.querySelector("[data-login_callback]").getAttribute("data-login_callback")];
@@ -244,10 +443,23 @@ function signin(email) {
                     document.querySelector(".intastellar-popup-shadow").style.visibility = "hidden";
                     fn(e.account);
                     window.removeEventListener("message", onMessage);
+                    signinInProgress = false;
+                    setSigninButtonsBusy(false);
                 } else {
                     throw new IntastellarSolutionsSDKError(e.error);
                 }
+            }).catch(() => {
+                signinInProgress = false;
+                setSigninButtonsBusy(false);
+                showSigninError("We couldn't sign you in. Please try again.");
             })
+        } else {
+            // Neither data-login_uri nor data-login_callback is configured, so
+            // there's nowhere to deliver the result. Reset the UI instead of
+            // leaving the button stuck showing "Signing in..." forever.
+            signinInProgress = false;
+            setSigninButtonsBusy(false);
+            showSigninError("Sign-in is misconfigured for this site. Please contact the site owner.");
         }
     }
 
@@ -327,7 +539,18 @@ const Intastellar = {
                 const IntastellarText = document.createElement("div");
                 const intastellarPopup = document.createElement("div");
                 IntastellarText.setAttribute("class", "intastellarSignIn-info");
-                if (type == null || type == undefined || type == "" || type == "intastellar") {
+                // If a session cookie is already present, the getuser fetch
+                // below is about to rewrite this label to "Sign in as X" --
+                // show a neutral skeleton instead of flashing the signed-out
+                // label first and immediately overwriting it (only matters
+                // for the "popup" picker, since that's the only mode that
+                // ever rewrites this label at all).
+                const hasExistingSession = theme.picker == "popup" && getCookie("inta_acc") != null;
+                if (hasExistingSession) {
+                    IntastellarText.innerHTML = '<span class="intastellar-skeleton" aria-hidden="true"></span>';
+                    IntastellarSigninButton.classList.add("intastellar-loading");
+                    IntastellarSigninButton.setAttribute("aria-busy", "true");
+                } else if (type == null || type == undefined || type == "" || type == "intastellar") {
                     IntastellarText.innerHTML = "Sign in with Intastellar"
                 } else if (type == "signup") {
                     IntastellarText.innerHTML = "Sign up with Intastellar"
@@ -335,12 +558,23 @@ const Intastellar = {
 
                 IntastellarSigninButton.setAttribute("class", "IntastellarSignin");
                 intastellarPopup.setAttribute("class", "intastellar-popup");
-                if (theme != null || theme != undefined) {
-                    if (theme.theme == "dark") {
-                        IntastellarSigninButton.classList.add("dark");
-                        intastellarPopup.classList.add("dark");
-                    }
 
+                // Default to the OS/browser color scheme when the integrator
+                // hasn't set an explicit theme, instead of always defaulting
+                // to light and clashing with a dark page.
+                const prefersDarkScheme = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+                if (theme?.theme === "dark" || (theme?.theme == null && prefersDarkScheme)) {
+                    IntastellarSigninButton.classList.add("dark");
+                    intastellarPopup.classList.add("dark");
+                }
+                if (theme?.theme == null && window.matchMedia) {
+                    window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", (e) => {
+                        IntastellarSigninButton.classList.toggle("dark", e.matches);
+                        intastellarPopup.classList.toggle("dark", e.matches);
+                    });
+                }
+
+                if (theme != null || theme != undefined) {
                     if (theme.scopes != null || theme.scopes != undefined) {
                         IntastellarSigninButton.setAttribute("data-scope", theme.scopes);
                     }
@@ -365,8 +599,16 @@ const Intastellar = {
 
                 const intastellarPopupShadow = document.createElement("div");
                 intastellarPopupShadow.setAttribute("class", "intastellar-popup-shadow");
-                /* intastellarPopupShadow.setAttribute("onclick", "document.querySelector('.intastellar-popup').style.bottom = '-100%'; this.style.visibility = 'hidden'"); */
+                // Close when the backdrop itself is clicked, but not when a
+                // click inside the popup bubbles up to it.
+                intastellarPopupShadow.addEventListener("click", (e) => {
+                    if (e.target === intastellarPopupShadow) {
+                        closeSignIn();
+                    }
+                });
                 intastellarPopupShadow.appendChild(intastellarPopup);
+                intastellarPopup.setAttribute("tabindex", "-1");
+                ensurePopupKeyboardHandling();
 
                 if (getCookie("inta_acc") != null) {
                     intastellarPopupShadow.setAttribute("style", "visibility: hidden");
@@ -388,6 +630,8 @@ const Intastellar = {
                             </button>
                         </header>`;
                 intastellarPopup.querySelector(".close-popup").addEventListener("click", closeSignIn);
+
+                intastellarPopupContent.innerHTML += `<p class="intastellar-popup-error" role="alert" hidden></p>`;
 
                 intastellarPopupContent.innerHTML += `<div class='intastellar-popup-header'>
                     <section>
@@ -434,9 +678,28 @@ const Intastellar = {
                     const type = document.querySelector("[data-login-type]")?.getAttribute("data-login-type");
                     const intastellarSignInInfo = document.querySelector(".intastellarSignIn-info");
                     const intastellarLogo = document.querySelector(".intastellar-logo");
+                    // loginbtn is null in "popup" picker mode: .IntastellarSignin
+                    // is never appended to the DOM there (there's no separate
+                    // trigger button -- the popup panel itself is the UI), so
+                    // this must stay guarded or it throws on every render in
+                    // that mode and silently kills the rest of this callback
+                    // via the .catch() below.
+                    if (loginbtn != null && loginbtn.classList.contains("intastellar-loading")) {
+                        loginbtn.classList.remove("intastellar-loading");
+                        loginbtn.removeAttribute("aria-busy");
+                        if (!user) {
+                            // The session cookie existed but the server says
+                            // we're not actually logged in (e.g. expired) --
+                            // fall back to the normal signed-out label instead
+                            // of leaving the skeleton markup in place.
+                            intastellarSignInInfo.innerHTML = (type == "signup") ? "Sign up with Intastellar" : "Sign in with Intastellar";
+                        }
+                    }
                     if (theme.picker == "popup") {
                         if (window.innerWidth > 768) {
-                            if (user) {
+                            // intastellarLogo is also null in "popup" mode for
+                            // the same reason as loginbtn above.
+                            if (user && intastellarLogo != null) {
                                 intastellarLogo.classList.add("reverse");
                             }
                             if (type == null || type == undefined || type == "") {
@@ -446,7 +709,9 @@ const Intastellar = {
                                 intastellarSignInInfo.innerHTML = "Sign up as " + escapeHtml(user.name.first);
                                 intastellarSignInInfo.innerHTML += "<span class='email'>" + escapeHtml(user.email) + "</span>";
                             }
-                            loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + escapeHtml(user.image) + "' alt='user profile image'>";
+                            if (loginbtn != null) {
+                                loginbtn.innerHTML += "<img class='intastellar-userProfile' src='" + escapeHtml(user.image) + "' alt='user profile image'>";
+                            }
                         } else {
 
                             if (user && user2.length == 0) {
@@ -475,29 +740,50 @@ const Intastellar = {
 
                     }
 
-                }).catch(e => {
+                }).catch(() => {
                     new IntastellarSolutionsSDKError("User not logged in");
+                    const loginbtn = document.querySelector(".IntastellarSignin");
+                    if (loginbtn != null && loginbtn.classList.contains("intastellar-loading")) {
+                        loginbtn.classList.remove("intastellar-loading");
+                        loginbtn.removeAttribute("aria-busy");
+                        const label = document.querySelector(".intastellarSignIn-info");
+                        if (label != null) {
+                            label.innerHTML = (type == "signup") ? "Sign up with Intastellar" : "Sign in with Intastellar";
+                        }
+                    }
                 })
 
-                if (IntastellarButtonContainer != null || IntastellarButtonContainer != undefined) {
-                    if (theme.picker != "popup") {
+                if (theme.picker != "popup") {
+                    // Only this branch actually needs the container element;
+                    // the "popup" mode below doesn't put anything into it, so
+                    // it must not be gated on the container existing too --
+                    // that previously meant a missing/mistyped element id
+                    // silently disabled the auto-opening popup entirely.
+                    if (IntastellarButtonContainer != null) {
                         IntastellarButtonContainer.appendChild(IntastellarSigninButton);
                         IntastellarSigninButton.addEventListener("click", (e) => {
                             e.preventDefault();
                             if (window.innerWidth > 768) {
                                 signin();
                             } else {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                                setTimeout(() => {
-                                    document.querySelector(".intastellar-popup").style.bottom = "0";
-                                }, 100);
+                                openSignInPanel();
                             }
                         })
+                    }
+                } else {
+                    if (getCookie("inta_acc") == null && getCookie("inta_state") != "1") {
+                        openSignInPanel();
                     } else {
-                        if (getCookie("inta_acc") == null) {
-                            if (getCookie("inta_state") != "1" && theme.picker == "popup") {
-                                document.querySelector(".intastellar-popup-shadow").style.visibility = "visible";
-                            }
+                        // Make the hidden state explicit via inline style
+                        // instead of leaning on the .top-left CSS rule's
+                        // default visibility -- that default is correct, but
+                        // depending on stylesheet load timing/specificity
+                        // for a security/UX-relevant show-or-hide decision is
+                        // fragile. This way the two cookie checks above are
+                        // the single source of truth either way.
+                        const shadow = document.querySelector(".intastellar-popup-shadow");
+                        if (shadow != null) {
+                            shadow.style.visibility = "hidden";
                         }
                     }
                 }
