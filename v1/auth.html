@@ -5,13 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login...</title>
+    <script src="./login.js"></script>
 </head>
 
 <body>
     <script>
-        const data = new URLSearchParams(window.location.search).get("token");
-        const decryptData = data;
-        localStorage.setItem("user", decryptData);
+        // signin() no longer puts the token/account payload in the URL (it used
+        // to, which leaked it into browser history and server logs). Instead it
+        // leaves a one-time reference in the intastellar_token_ref query param
+        // and the actual payload in sessionStorage, retrieved here.
+        const tokenRef = new URLSearchParams(window.location.search).get("intastellar_token_ref");
+        const account = Intastellar.accounts.id.consumeToken(tokenRef);
+        if (account != null) {
+            sessionStorage.setItem("user", JSON.stringify(account));
+        }
     </script>
     <!--  -->
 </body>
