@@ -12,6 +12,12 @@ export interface IntastellarUser {
 export interface IntastellarAccount {
   user: IntastellarUser;
   token: string;
+  /**
+   * Long-lived refresh token (apps, Entry=reactauth). Not stored by the SDK —
+   * keep it in secure storage (Keychain / Keystore) and trade it for new
+   * access tokens with refreshAccessToken().
+   */
+  refreshToken?: string;
 }
 
 export interface IntastellarTheme {
@@ -27,6 +33,14 @@ export interface IntastellarConfig {
   loginUri?: string;
   loginCallback?: (account: IntastellarAccount) => void;
   scopes?: string;
+}
+
+export interface IntastellarTokens {
+  /** New access token (base64 JWT, valid for `expiresIn` seconds). */
+  token: string;
+  /** The refresh token to use next time — the old one is no longer valid. */
+  refreshToken: string;
+  expiresIn: number;
 }
 
 export class IntastellarError extends Error {

@@ -44,16 +44,18 @@ export interface UseIntastellarRNReturn {
   isSignedIn: boolean;
 }
 
-/** The ?token= of a redirect URL, or null. Works for custom schemes and exp:// too. */
-function tokenFromUrl(url: string | null | undefined): string | null {
+/** A query parameter of a redirect URL, or null. Works for custom schemes and exp:// too. */
+function paramFromUrl(url: string | null | undefined, name: string): string | null {
   if (!url) return null;
   try {
-    return new URL(url).searchParams.get('token');
+    return new URL(url).searchParams.get(name);
   } catch {
-    const match = /[?&]token=([^&#]+)/.exec(url);
+    const match = new RegExp(`[?&]${name}=([^&#]+)`).exec(url);
     return match ? decodeURIComponent(match[1]) : null;
   }
 }
+
+const tokenFromUrl = (url: string | null | undefined) => paramFromUrl(url, 'token');
 
 export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNReturn {
   const [users, setUsers] = useState<IntastellarUser[]>([]);
@@ -116,6 +118,7 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
   /** Completes sign-in from a redirect URL (…?token=…). Ignores URLs without a token. */
   const handleRedirect = useCallback(async (url: string | null | undefined) => {
     const received = tokenFromUrl(url);
+    const refreshToken = paramFromUrl(url, 'refresh_token') || undefined;
     if (!received || handledToken.current === received) return;
     handledToken.current = received;
     try {
@@ -125,7 +128,7 @@ export function useIntastellarRN(config: IntastellarConfig): UseIntastellarRNRet
       setToken(received);
       setIsSignedIn(true);
       setError(null);
-      loginCallback.current?.(account);
+      loginCallback.current?.({ ...account, refreshToken });
     } catch (err) {
       handledToken.current = null;
       setError(err instanceof Error ? err.message : 'Authentication failed');

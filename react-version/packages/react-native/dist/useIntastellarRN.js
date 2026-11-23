@@ -32,18 +32,19 @@ else {
     }
 }
 const TOKEN_KEY = 'intastellar_token';
-/** The ?token= of a redirect URL, or null. Works for custom schemes and exp:// too. */
-function tokenFromUrl(url) {
+/** A query parameter of a redirect URL, or null. Works for custom schemes and exp:// too. */
+function paramFromUrl(url, name) {
     if (!url)
         return null;
     try {
-        return new URL(url).searchParams.get('token');
+        return new URL(url).searchParams.get(name);
     }
     catch (_a) {
-        const match = /[?&]token=([^&#]+)/.exec(url);
+        const match = new RegExp(`[?&]${name}=([^&#]+)`).exec(url);
         return match ? decodeURIComponent(match[1]) : null;
     }
 }
+const tokenFromUrl = (url) => paramFromUrl(url, 'token');
 export function useIntastellarRN(config) {
     const [users, setUsers] = useState([]);
     const [token, setToken] = useState(null);
@@ -102,6 +103,7 @@ export function useIntastellarRN(config) {
     const handleRedirect = useCallback(async (url) => {
         var _a;
         const received = tokenFromUrl(url);
+        const refreshToken = paramFromUrl(url, 'refresh_token') || undefined;
         if (!received || handledToken.current === received)
             return;
         handledToken.current = received;
@@ -112,7 +114,7 @@ export function useIntastellarRN(config) {
             setToken(received);
             setIsSignedIn(true);
             setError(null);
-            (_a = loginCallback.current) === null || _a === void 0 ? void 0 : _a.call(loginCallback, account);
+            (_a = loginCallback.current) === null || _a === void 0 ? void 0 : _a.call(loginCallback, Object.assign(Object.assign({}, account), { refreshToken }));
         }
         catch (err) {
             handledToken.current = null;
