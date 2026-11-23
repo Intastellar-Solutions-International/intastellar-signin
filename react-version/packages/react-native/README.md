@@ -81,7 +81,7 @@ function App() {
 import { useIntastellarRN } from "@intastellar/signin-sdk-react-native";
 
 function MyComponent() {
-  const { users, isLoading, signin, logout, isSignedIn } = useIntastellarRN({
+  const { users, token, isLoading, signin, logout, isSignedIn } = useIntastellarRN({
     clientId: "your-client-id",
     loginUri: "myapp://auth",
   });
@@ -101,6 +101,42 @@ function MyComponent() {
   );
 }
 ```
+
+## How sign-in works
+
+1. `signin()` opens Intastellar Accounts in an **auth session**:
+   `WebBrowser.openAuthSessionAsync` on Expo, `InAppBrowser.openAuth` on bare
+   React Native (iOS: ASWebAuthenticationSession, Android: Custom Tabs).
+2. After sign-in, Accounts redirects to your `loginUri` with `?token=…`
+   (`Entry=reactauth` — Accounts keeps your scheme, e.g. `myapp://auth`).
+3. The auth session closes itself on that redirect and hands the URL back;
+   the SDK verifies the token, stores it and calls `loginCallback`.
+
+A redirect that **launches** the app (the app was closed meanwhile) is picked
+up from `Linking.getInitialURL()`, and the deep-link listener covers the
+external-browser fallback. Each token is handled once.
+
+### `loginUri` in Expo Go
+
+Expo Go can't open your own scheme. Build `loginUri` with `expo-linking` so it
+matches where the app runs:
+
+```jsx
+import * as Linking from "expo-linking";
+
+const loginUri = Linking.createURL("auth");
+// Expo Go:                    exp://192.168.0.10:8081/--/auth
+// development / store build:  myapp://auth   (app.json → expo.scheme)
+```
+
+With Expo Router, add a route for that path (e.g. `app/auth.js`) so the
+redirect doesn't land on "Unmatched route".
+
+### Redirect URIs
+
+Intastellar Accounts only redirects to addresses registered for your
+`clientId` — register your app's `loginUri` (and, for development,
+`exp://…/--/auth`).
 
 ## Configuration
 
@@ -150,3 +186,14 @@ function MyComponent() {
 ## License
 
 MIT © Intastellar Solutions International
+
+## Changelog
+
+### 1.2.0
+
+- Sign-in uses an auth session (`openAuthSessionAsync` / `InAppBrowser.openAuth`):
+  the browser closes itself on the redirect, no "Open in app?" prompt.
+- Sends `Entry=reactauth` — Accounts redirects to `loginUri` with its own scheme.
+- Handles a redirect that launched the app (`Linking.getInitialURL()`).
+- Each redirect token is handled once.
+- The hook returns `token` (also after an app restart).
